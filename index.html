@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;600;700&family=Moul&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <style>
         body { 
             font-family: 'Kantumruy Pro', sans-serif; 
@@ -46,10 +47,12 @@
         body.light-mode #settings-view h3,
         body.light-mode #settings-view p.text-gray-200,
         body.light-mode #notification-modal h3,
-        body.light-mode #notification-modal h4 { color: #111827; }
+        body.light-mode #notification-modal h4,
+        body.light-mode #qr-scanner-modal h3 { color: #111827; }
 
         body.light-mode #settings-view p.text-gray-400,
-        body.light-mode #notification-modal p.text-gray-400 { color: #6b7280; }
+        body.light-mode #notification-modal p.text-gray-400,
+        body.light-mode #qr-scanner-modal p.text-gray-400 { color: #6b7280; }
         
         body.light-mode #settings-view i.text-gray-300,
         body.light-mode #settings-view i.text-gray-400 { color: #6b7280; }
@@ -137,7 +140,7 @@
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <i data-lucide="key" class="w-5 h-5 text-gray-400"></i>
                             </div>
-                            <input value="KS9lutduPQZambSiLyZzFgh0xDh1" type="text" id="teacher-code" required placeholder="បញ្ចូលលេខកូដថ្នាក់..." 
+                            <input type="text" id="teacher-code" required placeholder="បញ្ចូលលេខកូដថ្នាក់..." 
                                 class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white/20 transition mb-3">
                         </div>
                         
@@ -157,7 +160,7 @@
 
                     <div class="flex gap-3 pt-2">
                         <!-- Scan Button -->
-                        <button type="button" onclick="scanQR()" class="flex-[0.3] flex flex-col items-center justify-center bg-gray-700/50 hover:bg-gray-600/50 border border-gray-500/50 text-white py-2.5 rounded-xl transition">
+                        <button type="button" onclick="scanQR()" style="touch-action: manipulation;" class="flex-[0.3] flex flex-col items-center justify-center bg-gray-700/50 hover:bg-gray-600/50 border border-gray-500/50 text-white py-2.5 rounded-xl transition cursor-pointer">
                             <i data-lucide="qr-code" class="w-6 h-6 mb-1"></i>
                             <span class="text-[10px] font-bold">ស្កេន</span>
                         </button>
@@ -355,35 +358,24 @@
         </div>
     </div>
 
-    <!-- Notification Modal (Hidden by default) -->
-    <div id="notification-modal" class="fixed inset-0 z-[60] hidden flex-col justify-end">
-        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="toggleNotifications()"></div>
-        <div class="bg-card-dark w-full rounded-t-3xl border-t border-gray-700 relative z-10 transform translate-y-0 transition-transform duration-300 h-[70vh] flex flex-col pb-safe">
-            <div class="flex justify-center pt-3 pb-1">
-                <div class="w-12 h-1.5 bg-gray-600 rounded-full"></div>
-            </div>
-            <div class="flex justify-between items-center px-6 py-4 border-b border-gray-700">
-                <h3 class="text-white font-bold text-lg flex items-center gap-2">
-                    <i data-lucide="bell-ring" class="w-5 h-5 text-emerald-500"></i> សារជូនដំណឹង
-                </h3>
-                <button onclick="toggleNotifications()" class="text-gray-400 hover:text-white bg-gray-800 p-1.5 rounded-full">
+    <!-- QR Scanner Modal -->
+    <div id="qr-scanner-modal" class="fixed inset-0 z-[70] hidden flex-col items-center justify-center px-4">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeQRScanner()"></div>
+        <div class="bg-card-dark w-full max-w-sm rounded-[2rem] border border-gray-700 relative z-10 shadow-2xl p-6 transform scale-95 opacity-0 transition-all duration-300" id="qr-scanner-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-white font-bold text-xl">ស្កេន QR Code</h3>
+                <button onclick="closeQRScanner()" class="text-gray-400 hover:text-white bg-gray-800 p-1.5 rounded-full transition">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
+            <p class="text-gray-400 text-[13px] mb-4 text-center">សូមដាក់កាមេរ៉ារបស់អ្នកឱ្យចំ QR Code ដើម្បីចូលប្រព័ន្ធ។</p>
             
-            <div class="flex-1 overflow-y-auto p-4 space-y-3">
-                <!-- Notification Item 1 -->
-                <div class="bg-[#1c1c1e] p-4 rounded-2xl border border-gray-700 flex gap-3">
-                    <div class="bg-emerald-500/20 p-2 rounded-full h-fit">
-                        <i data-lucide="megaphone" class="w-5 h-5 text-emerald-500"></i>
-                    </div>
-                    <div>
-                        <h4 class="text-white font-bold text-sm">សូមស្វាគមន៍មកកាន់ Parent Portal</h4>
-                        <p class="text-gray-400 text-xs mt-1 leading-relaxed">ប្រព័ន្ធនេះជួយលោកអ្នកអាចតាមដានការសិក្សារបស់កូនៗបានយ៉ាងងាយស្រួល។</p>
-                        <p class="text-emerald-500 text-[10px] mt-2">ថ្មីៗ</p>
-                    </div>
-                </div>
+            <!-- Camera Preview Container -->
+            <div class="w-full bg-black rounded-2xl overflow-hidden border-2 border-emerald-500/50 relative flex items-center justify-center min-h-[250px]">
+                <div id="qr-reader" class="w-full"></div>
             </div>
+            
+            <p id="qr-status" class="text-emerald-500 text-xs text-center mt-4 animate-pulse">កំពុងបើកកាមេរ៉ា...</p>
         </div>
     </div>
 
@@ -739,8 +731,103 @@
             }
         }
 
+        // --- In-App QR Code Scanner Logic ---
+        let html5QrCode;
+
         window.scanQR = function() {
-            alert("ប្រសិនបើអ្នកមាន QR Code ពីលោកគ្រូ/អ្នកគ្រូ សូមប្រើកាមេរ៉ាទូរស័ព្ទដៃធម្មតារបស់អ្នក ដើម្បីស្កេនរូបភាពនោះ រួចចុចលើ Link វានឹងបើកចូលដោយស្វ័យប្រវត្តិ។");
+            const modal = document.getElementById('qr-scanner-modal');
+            const content = document.getElementById('qr-scanner-content');
+            const statusText = document.getElementById('qr-status');
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            statusText.textContent = "កំពុងបើកកាមេរ៉ា...";
+            statusText.className = "text-emerald-500 text-xs text-center mt-4 animate-pulse";
+            
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+
+            // Initialize Scanner
+            if (!html5QrCode) {
+                html5QrCode = new Html5Qrcode("qr-reader");
+            }
+
+            // Start scanning with rear camera
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+            
+            html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
+                .then(() => {
+                    statusText.textContent = "កំពុងស្កេន...";
+                })
+                .catch((err) => {
+                    console.error("Camera start failed:", err);
+                    statusText.textContent = "មិនអាចបើកកាមេរ៉ាបានទេ! សូមពិនិត្យមើលសិទ្ធិអនុញ្ញាតកាមេរ៉ា (Camera Permissions) នៅលើ Browser របស់អ្នក។";
+                    statusText.className = "text-red-500 text-xs text-center mt-4";
+                });
+        }
+
+        function onScanSuccess(decodedText, decodedResult) {
+            try {
+                // Parse the URL from the QR code (Example: https://.../?tid=xxx&sid=yyy)
+                const url = new URL(decodedText);
+                const tid = url.searchParams.get('tid');
+                const sid = url.searchParams.get('sid');
+                
+                if (tid && sid) {
+                    const statusText = document.getElementById('qr-status');
+                    statusText.textContent = "ស្កេនបានជោគជ័យ! កំពុងចូល...";
+                    statusText.className = "text-emerald-500 text-xs text-center mt-4 font-bold";
+                    
+                    // Fill the input forms
+                    document.getElementById('teacher-code').value = tid;
+                    document.getElementById('student-code').value = sid;
+
+                    // Stop scanner and attempt login
+                    closeQRScanner().then(() => {
+                        attemptLogin(tid, sid);
+                    });
+                } else {
+                    throw new Error("Invalid format");
+                }
+            } catch (e) {
+                const statusText = document.getElementById('qr-status');
+                statusText.textContent = "QR Code មិនត្រឹមត្រូវ! សូមស្កេន QR របស់ Parent Portal វិញ។";
+                statusText.className = "text-red-500 text-xs text-center mt-4 animate-bounce";
+            }
+        }
+
+        window.closeQRScanner = function() {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('qr-scanner-modal');
+                const content = document.getElementById('qr-scanner-content');
+                
+                content.classList.remove('scale-100', 'opacity-100');
+                content.classList.add('scale-95', 'opacity-0');
+                
+                // Properly stop camera stream if it is running
+                const stopScanner = () => {
+                    if (html5QrCode && html5QrCode.getState() === 2) { // 2 = SCANNING
+                        html5QrCode.stop().then(() => {
+                            html5QrCode.clear();
+                            finishClose();
+                        }).catch(finishClose);
+                    } else {
+                        finishClose();
+                    }
+                };
+
+                const finishClose = () => {
+                    setTimeout(() => {
+                        modal.classList.add('hidden');
+                        modal.classList.remove('flex');
+                        resolve();
+                    }, 300);
+                };
+
+                stopScanner();
+            });
         }
     </script>
 </body>
