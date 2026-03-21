@@ -158,10 +158,17 @@
         const db = getFirestore(app);
         const PTEC_APP_ID = "ptec-app";
 
-        // State Variables
-        let savedTid = localStorage.getItem('savedTid');
-        let savedSid = localStorage.getItem('savedSid');
-        let allRecords = []; // Stores formatted array of records {date, status, note}
+        // State Variables - Wrapped safely for mobile privacy browsers
+        let savedTid = null;
+        let savedSid = null;
+        try {
+            savedTid = localStorage.getItem('savedTid');
+            savedSid = localStorage.getItem('savedSid');
+        } catch (e) {
+            console.warn("Storage access denied on this mobile browser.");
+        }
+        
+        let allRecords = []; 
         const khMonths = ["មករា", "កុម្ភៈ", "មីនា", "មេសា", "ឧសភា", "មិថុនា", "កក្កដា", "សីហា", "កញ្ញា", "តុលា", "វិច្ឆិកា", "ធ្នូ"];
         const khDigits = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
         
@@ -169,48 +176,56 @@
             return num.toString().split('').map(d => khDigits[d] || d).join(''); 
         }
 
-        // Apply theme from index.html setting
+        // Safe Icon Loader (prevents crash if CDN is slow on mobile data)
+        function safeCreateIcons() {
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
         if (localStorage.getItem('theme') === 'light') {
             document.body.classList.add('light-mode');
         }
 
-        lucide.createIcons();
+        safeCreateIcons();
 
-        // Check if user is legally here
+        // Mobile Fix: Hide loader before redirecting if unauthorized
         if (!savedTid || !savedSid) {
+            document.getElementById('loading-overlay').classList.add('hidden');
             alert("សូមធ្វើការឡុកចូលជាមុនសិន!");
             window.location.href = 'index.html';
+        } else {
+            // Init Auth & Fetch Data
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    await fetchData();
+                } else {
+                    // Mobile Fix: Catch network auth errors and hide loader
+                    signInAnonymously(auth).catch(err => {
+                        console.error("Auth error:", err);
+                        document.getElementById('loading-overlay').classList.add('hidden');
+                        alert("មានបញ្ហាក្នុងការភ្ជាប់ប្រព័ន្ធ។ សូមពិនិត្យអ៊ីនធឺណិតរបស់អ្នក។");
+                    });
+                }
+            });
         }
-
-        // Init Auth & Fetch Data
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                await fetchData();
-            } else {
-                signInAnonymously(auth).catch(err => console.error(err));
-            }
-        });
 
         // Setup Dates
         const todayObj = new Date();
         const yyyy = todayObj.getFullYear();
         const mm = String(todayObj.getMonth() + 1).padStart(2, '0');
         const dd = String(todayObj.getDate()).padStart(2, '0');
-        const todayStr = `${yyyy}-${mm}-${dd}`; // YYYY-MM-DD format
+        const todayStr = `${yyyy}-${mm}-${dd}`; 
         
         document.getElementById('today-date-text').textContent = `${toKhmerNum(todayObj.getDate())} ${khMonths[todayObj.getMonth()]}`;
 
         const currentMonthString = `${yyyy}-${mm}`;
         document.getElementById('month-filter').value = currentMonthString;
 
-        // Listen for month change
         document.getElementById('month-filter').addEventListener('change', () => {
             renderList();
         });
 
         async function fetchData() {
             try {
-                // 1. Fetch Student Info (to show name & photo)
                 const studentRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', savedTid, 'students', savedSid);
                 const studentSnap = await getDoc(studentRef);
                 
@@ -223,17 +238,15 @@
                     }
                 }
 
-                // 2. Fetch Attendance History from Teacher's class data
                 const classDocRef = doc(db, "users", savedTid, "data", "class_default");
                 const classDocSnap = await getDoc(classDocRef);
                 
-                allRecords = []; // Reset
+                allRecords = []; 
 
                 if (classDocSnap.exists()) {
                     const data = classDocSnap.data();
                     const history = data.attendanceHistory || {};
                     
-                    // Convert nested object to flat array for this specific student
                     for (const date in history) {
                         if (history[date][savedSid]) {
                             allRecords.push({
@@ -244,13 +257,11 @@
                         }
                     }
 
-                    // Sort descending (newest first)
-                    allRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
+                    // Mobile Fix: Use localeCompare instead of new Date() to avoid Safari NaN crash
+                    allRecords.sort((a, b) => b.date.localeCompare(a.date));
                 }
 
-                // Render Today's Status
                 renderTodayStatus();
-                // Render List
                 renderList();
 
             } catch (error) {
@@ -261,20 +272,20 @@
                         <p class="text-red-400 text-sm">មានបញ្ហាក្នុងការទាញយកទិន្នន័យ។ សូមសាកល្បងម្ដងទៀត។</p>
                     </div>
                 `;
-                lucide.createIcons();
+                safeCreateIcons();
             } finally {
-                // Hide loader
                 const loader = document.getElementById('loading-overlay');
                 loader.classList.add('opacity-0');
                 setTimeout(() => loader.classList.add('hidden'), 300);
             }
         }
 
+        // Mobile Tailwind Fix: Provide the full border-l class string so Tailwind CDN can compile it
         function getStatusConfig(status) {
-            if (status === 'P') return { icon: 'check', colorClass: 'text-emerald-500', borderColor: 'border-emerald-500/30 bg-emerald-500/10', label: 'មានវត្តមាន' };
-            if (status === 'L') return { icon: 'file-text', colorClass: 'text-yellow-500', borderColor: 'border-yellow-500/30 bg-yellow-500/10', label: 'សុំច្បាប់' };
-            if (status === 'A') return { icon: 'x', colorClass: 'text-red-500', borderColor: 'border-red-500/30 bg-red-500/10', label: 'អវត្តមាន' };
-            return { icon: 'help-circle', colorClass: 'text-gray-500', borderColor: 'border-gray-500/30 bg-gray-500/10', label: 'មិនស្គាល់' };
+            if (status === 'P') return { icon: 'check', colorClass: 'text-emerald-500', borderColor: 'border-emerald-500/30 bg-emerald-500/10', leftBorder: 'border-l-emerald-500', label: 'មានវត្តមាន' };
+            if (status === 'L') return { icon: 'file-text', colorClass: 'text-yellow-500', borderColor: 'border-yellow-500/30 bg-yellow-500/10', leftBorder: 'border-l-yellow-500', label: 'សុំច្បាប់' };
+            if (status === 'A') return { icon: 'x', colorClass: 'text-red-500', borderColor: 'border-red-500/30 bg-red-500/10', leftBorder: 'border-l-red-500', label: 'អវត្តមាន' };
+            return { icon: 'help-circle', colorClass: 'text-gray-500', borderColor: 'border-gray-500/30 bg-gray-500/10', leftBorder: 'border-l-gray-500', label: 'មិនស្គាល់' };
         }
 
         function renderTodayStatus() {
@@ -283,7 +294,8 @@
 
             if (todayRecord) {
                 const config = getStatusConfig(todayRecord.status);
-                todayCard.className = `bg-card-dark rounded-2xl p-4 border border-gray-700 shadow-sm flex items-center justify-between gap-4 border-l-4 border-l-${config.colorClass.split('-')[1]}-500`;
+                // Updated with safe leftBorder class
+                todayCard.className = `bg-card-dark rounded-2xl p-4 border border-gray-700 shadow-sm flex items-center justify-between gap-4 border-l-4 ${config.leftBorder}`;
                 
                 todayCard.innerHTML = `
                     <div class="flex items-center gap-3">
@@ -309,14 +321,13 @@
                     </div>
                 `;
             }
-            lucide.createIcons();
+            safeCreateIcons();
         }
 
         function renderList() {
             const listContainer = document.getElementById('history-list');
-            const selectedMonth = document.getElementById('month-filter').value; // YYYY-MM
+            const selectedMonth = document.getElementById('month-filter').value; 
             
-            // Filter records by selected month
             const filteredRecords = allRecords.filter(record => record.date.startsWith(selectedMonth));
             
             let countP = 0, countL = 0, countA = 0;
@@ -336,19 +347,17 @@
                 let tableRows = '';
 
                 filteredRecords.forEach(record => {
-                    // Update Counters
                     if (record.status === 'P') countP++;
                     else if (record.status === 'L') countL++;
                     else if (record.status === 'A') countA++;
 
-                    // Formatting Date (e.g., 24 មីនា)
-                    const d = new Date(record.date);
-                    const dayKh = toKhmerNum(d.getDate());
-                    const monthKh = khMonths[d.getMonth()];
+                    // Note: Since we need accurate dates for the Khmer display, we append 'T00:00:00' to ensure timezone consistency across mobile devices
+                    const d = new Date(record.date + 'T00:00:00');
+                    const dayKh = toKhmerNum(d.getDate() || 1); 
+                    const monthKh = khMonths[d.getMonth() || 0];
                     
                     const config = getStatusConfig(record.status);
 
-                    // Table Row Construction
                     tableRows += `
                         <tr class="active:bg-black/10 transition-colors">
                             <td class="py-3 px-4 whitespace-nowrap align-top w-[90px]">
@@ -369,7 +378,6 @@
                     `;
                 });
 
-                // Wrap rows in a responsive table
                 html = `
                     <div class="bg-card-dark rounded-2xl border border-gray-700/60 overflow-hidden shadow-sm">
                         <table class="w-full text-left border-collapse">
@@ -387,15 +395,13 @@
                 `;
             }
 
-            // Update DOM
             listContainer.innerHTML = html;
             
-            // Update Summary Stats with Khmer Numerals
             document.getElementById('total-p').textContent = toKhmerNum(countP);
             document.getElementById('total-l').textContent = toKhmerNum(countL);
             document.getElementById('total-a').textContent = toKhmerNum(countA);
 
-            lucide.createIcons();
+            safeCreateIcons();
         }
     </script>
 </body>
