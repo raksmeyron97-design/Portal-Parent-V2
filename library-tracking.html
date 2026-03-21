@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>សៀវភៅតាមដាន - Parent Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;600;700&family=Moul&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { 
+            font-family: 'Kantumruy Pro', sans-serif; 
+            background-color: #121212; 
+            color: #ffffff;
+            margin: 0; 
+            padding: 0; 
+            overflow-x: hidden; 
+            transition: background-color 0.3s ease, color 0.3s ease;
+            -webkit-tap-highlight-color: transparent; 
+        }
+        .kh-moul { font-family: 'Moul', cursive; }
+        
+        /* Mobile Safe Areas */
+        .pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 1rem); }
+        .pt-safe { padding-top: max(env(safe-area-inset-top), 1rem); }
+        
+        /* Custom Colors */
+        .bg-app-dark { background-color: #1c1c1e; transition: background-color 0.3s ease; }
+        .bg-card-dark { background-color: #2c2c2e; transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; }
+        .bg-header-green { background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%); }
+        
+        /* Light Mode Adjustments */
+        body.light-mode { background-color: #f9fafb; color: #1f2937; }
+        body.light-mode .bg-app-dark { background-color: #f9fafb; }
+        body.light-mode .bg-card-dark { background-color: #ffffff; border-color: #e5e7eb; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+        body.light-mode .text-gray-400 { color: #6b7280; }
+        body.light-mode .text-gray-300 { color: #4b5563; }
+        body.light-mode .text-gray-200 { color: #374151; }
+        body.light-mode .border-gray-800 { border-color: #e5e7eb; }
+        body.light-mode .border-gray-700 { border-color: #f3f4f6; }
+        body.light-mode .divide-gray-800 > :not([hidden]) ~ :not([hidden]) { border-color: #f3f4f6; }
+        body.light-mode .bg-gray-800 { background-color: #f3f4f6; }
+        
+        /* Hide scrollbar */
+        ::-webkit-scrollbar { display: none; }
+        
+        /* Loader Loader */
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid #10b981; 
+            width: 24px;
+            height: 24px;
+            -webkit-animation: spin 1s linear infinite; 
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+        }
+        body.light-mode select {
+            background-color: #f9fafb;
+            color: #1f2937;
+            border-color: #d1d5db;
+        }
+    </style>
+</head>
+<body class="bg-app-dark min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <div class="bg-header-green pt-safe pb-4 px-4 shadow-md sticky top-0 z-50 flex items-center justify-between">
+        <button onclick="window.location.href='index.html'" class="text-white p-2 bg-white/10 rounded-full hover:bg-white/20 transition backdrop-blur-sm">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+        </button>
+        <h1 class="text-white font-bold text-lg kh-moul">សៀវភៅតាមដាន</h1>
+        <div class="w-9 h-9 flex items-center justify-center bg-white/10 rounded-full backdrop-blur-sm">
+            <i data-lucide="book-user" class="w-5 h-5 text-emerald-100"></i>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 px-4 py-5 flex flex-col gap-4 pb-10">
+        
+        <!-- Student Identity Brief -->
+        <div class="bg-card-dark rounded-2xl p-4 shadow-sm border border-gray-800 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-full border border-gray-600 overflow-hidden bg-gray-200 shrink-0">
+                <img id="student-photo" src="" alt="Student" class="w-full h-full object-cover">
+            </div>
+            <div>
+                <p class="text-xs text-gray-400 mb-0.5">សិស្ស៖</p>
+                <h2 id="student-name" class="font-bold text-base text-gray-200 kh-moul">កំពុងផ្ទុក...</h2>
+                <p id="student-id" class="text-xs text-emerald-500 font-mono mt-0.5">ID: ***</p>
+            </div>
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="bg-card-dark rounded-2xl p-4 shadow-sm border border-gray-800 space-y-3">
+            <div class="flex items-center gap-2 mb-1">
+                <i data-lucide="calendar-search" class="w-4 h-4 text-emerald-500"></i>
+                <h3 class="font-bold text-sm text-gray-200">ជ្រើសរើសពេលវេលា</h3>
+            </div>
+            
+            <select id="yearSelect" class="w-full bg-[#1c1c1e] text-white border border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500 transition shadow-sm" onchange="updatePeriodOptions()">
+                <option value="2025-2026" selected>ឆ្នាំសិក្សា ២០២៥-២០២៦</option>
+                <option value="2026-2027">ឆ្នាំសិក្សា ២០២៦-២០២៧</option>
+                <option value="2027-2028">ឆ្នាំសិក្សា ២០២៧-២០២៨</option>
+            </select>
+
+            <div class="grid grid-cols-2 gap-3">
+                <select id="typeSelect" class="w-full bg-[#1c1c1e] text-white border border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500 transition shadow-sm" onchange="updatePeriodOptions()">
+                    <option value="monthly" selected>ប្រចាំខែ</option>
+                    <option value="semester">ប្រចាំឆមាស</option>
+                </select>
+                
+                <select id="periodSelect" class="w-full bg-[#1c1c1e] text-white border border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500 transition shadow-sm" onchange="fetchScores()">
+                    <!-- Options populated by JS -->
+                </select>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading-state" class="hidden flex-col items-center justify-center py-10">
+            <div class="spinner mb-3"></div>
+            <p class="text-sm text-gray-400">កំពុងទាញយកទិន្នន័យ...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden flex-col items-center justify-center py-10 bg-card-dark rounded-2xl border border-gray-800 border-dashed">
+            <i data-lucide="folder-search" class="w-12 h-12 text-gray-600 mb-3"></i>
+            <p class="text-sm font-bold text-gray-300">មិនទាន់មានលទ្ធផលទេ</p>
+            <p class="text-xs text-gray-500 mt-1">លោកគ្រូ/អ្នកគ្រូមិនទាន់បានបញ្ចូលពិន្ទុសម្រាប់ខែនេះឡើយ។</p>
+        </div>
+
+        <!-- Results Container -->
+        <div id="results-container" class="hidden flex-col gap-4">
+            
+            <!-- Overall Summary Cards -->
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-card-dark p-4 rounded-2xl border border-gray-800 shadow-sm flex flex-col items-center justify-center relative overflow-hidden">
+                    <div class="absolute -right-2 -top-2 opacity-5"><i data-lucide="calculator" class="w-16 h-16 text-white"></i></div>
+                    <span class="text-gray-400 text-[11px] mb-1 font-semibold z-10">មធ្យមភាគ</span>
+                    <span id="res-avg" class="text-3xl font-bold text-blue-500 z-10">-</span>
+                </div>
+                
+                <div class="bg-card-dark p-4 rounded-2xl border border-gray-800 shadow-sm flex flex-col items-center justify-center relative overflow-hidden">
+                    <div class="absolute -right-2 -top-2 opacity-5"><i data-lucide="award" class="w-16 h-16 text-white"></i></div>
+                    <span class="text-gray-400 text-[11px] mb-1 font-semibold z-10">ចំណាត់ថ្នាក់ទី</span>
+                    <span id="res-rank" class="text-3xl font-bold text-red-500 z-10">-</span>
+                </div>
+
+                <div class="bg-card-dark p-4 rounded-2xl border border-gray-800 shadow-sm flex flex-col items-center justify-center relative overflow-hidden">
+                    <div class="absolute -right-2 -top-2 opacity-5"><i data-lucide="sigma" class="w-16 h-16 text-white"></i></div>
+                    <span class="text-gray-400 text-[11px] mb-1 font-semibold z-10">ពិន្ទុសរុប</span>
+                    <span id="res-total" class="text-2xl font-bold text-emerald-500 z-10">-</span>
+                </div>
+
+                <div class="bg-card-dark p-4 rounded-2xl border border-gray-800 shadow-sm flex flex-col items-center justify-center relative overflow-hidden">
+                    <div class="absolute -right-2 -top-2 opacity-5"><i data-lucide="medal" class="w-16 h-16 text-white"></i></div>
+                    <span class="text-gray-400 text-[11px] mb-1 font-semibold z-10">និទ្ទេស</span>
+                    <span id="res-grade" class="text-2xl font-bold text-amber-500 z-10">-</span>
+                </div>
+            </div>
+
+            <!-- Subject Scores List -->
+            <div class="bg-card-dark rounded-2xl border border-gray-800 shadow-sm overflow-hidden">
+                <div class="bg-gray-800/50 px-4 py-3 border-b border-gray-700 flex items-center justify-between">
+                    <h3 class="font-bold text-sm text-gray-200">ពិន្ទុតាមមុខវិជ្ជា</h3>
+                    <span id="sub-count" class="text-xs bg-emerald-500/20 text-emerald-500 px-2 py-0.5 rounded-full font-bold">០ មុខវិជ្ជា</span>
+                </div>
+                <div id="subjects-list" class="divide-y divide-gray-800">
+                    <!-- Dynamic Subject Rows -->
+                </div>
+            </div>
+
+            <!-- Teacher Comments & Attendance -->
+            <div class="bg-card-dark rounded-2xl border border-gray-800 shadow-sm overflow-hidden mb-6">
+                <div class="px-4 py-3 border-b border-gray-700 flex items-center gap-2">
+                    <i data-lucide="message-square-text" class="w-4 h-4 text-emerald-500"></i>
+                    <h3 class="font-bold text-sm text-gray-200">វាយតម្លៃបន្ថែម</h3>
+                </div>
+                <div class="p-4 space-y-4">
+                    <!-- Attendance -->
+                    <div class="flex items-center justify-between bg-gray-800/30 p-3 rounded-xl border border-gray-700/50">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-orange-500/20 p-2 rounded-lg"><i data-lucide="user-minus" class="w-4 h-4 text-orange-500"></i></div>
+                            <div>
+                                <p class="text-[11px] text-gray-400">អវត្តមានសរុប</p>
+                                <p class="text-sm font-bold text-gray-200"><span id="att-total">0</span> ដង</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[10px] text-gray-400">មានច្បាប់: <span id="att-permission" class="font-bold text-gray-200">0</span></p>
+                            <p class="text-[10px] text-gray-400">ឥតច្បាប់: <span id="att-absent" class="font-bold text-red-400">0</span></p>
+                        </div>
+                    </div>
+                    
+                    <!-- Comment -->
+                    <div>
+                        <p class="text-xs text-gray-400 mb-1">មូលវិចារគ្រូប្រចាំថ្នាក់៖</p>
+                        <div class="bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-xl">
+                            <p id="teacher-comment" class="text-sm text-emerald-500 font-semibold leading-relaxed">
+                                -
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBU50HJrekgHWwwyLq5CTRwhjHkGJAAAfs",
+            authDomain: "classroom-management-82382.firebaseapp.com",
+            projectId: "classroom-management-82382",
+            storageBucket: "classroom-management-82382.firebasestorage.app",
+            messagingSenderId: "146641865620",
+            appId: "1:146641865620:web:ce693b7b064afd5d1bdd81"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const PTEC_APP_ID = "ptec-app";
+
+        // State variables
+        let tid = localStorage.getItem('savedTid');
+        let sid = localStorage.getItem('savedSid');
+        let customSubjects = [];
+        let attendanceHistory = {};
+
+        // Base Subjects List (Same as student-tracking.html)
+        const baseMonthlySubjects = [
+            { key: 'kh_listen', label: 'ស្តាប់', max: 10, icon: 'ear', color: 'text-purple-500' },
+            { key: 'kh_speak', label: 'និយាយ', max: 10, icon: 'mic', color: 'text-purple-500' },
+            { key: 'kh_read', label: 'អាន', max: 10, icon: 'book-open', color: 'text-purple-500' },
+            { key: 'kh_write', label: 'សរសេរ', max: 10, icon: 'pen-tool', color: 'text-purple-500' },
+            { key: 'kh_calligraphy', label: 'អក្សរផ្ចង់', max: 10, icon: 'pen', color: 'text-purple-500' },
+            { key: 'kh_recitation', label: 'មេសូត្រ', max: 10, icon: 'music', color: 'text-purple-500' },
+            { key: 'kh_essay', label: 'តែងសេចក្តី', max: 10, icon: 'file-text', color: 'text-purple-500' },
+            { key: 'math_num', label: 'ចំនួន', max: 10, icon: 'calculator', color: 'text-orange-500' },
+            { key: 'math_meas', label: 'រង្វាស់រង្វាល់', max: 10, icon: 'ruler', color: 'text-orange-500' },
+            { key: 'math_geo', label: 'ធរណីមាត្រ', max: 10, icon: 'triangle', color: 'text-orange-500' },
+            { key: 'math_alg', label: 'ពីជគណិត', max: 10, icon: 'function-square', color: 'text-orange-500' },
+            { key: 'math_stat', label: 'ស្ថិតិ', max: 10, icon: 'bar-chart', color: 'text-orange-500' },
+            { key: 'sci_phy', label: 'រូបវិទ្យា', max: 10, icon: 'zap', color: 'text-green-500' },
+            { key: 'sci_chem', label: 'គីមីវិទ្យា', max: 10, icon: 'flask-conical', color: 'text-green-500' },
+            { key: 'sci_bio', label: 'ជីវវិទ្យា', max: 10, icon: 'leaf', color: 'text-green-500' },
+            { key: 'sci_earth', label: 'ផែនដីវិទ្យា', max: 10, icon: 'globe', color: 'text-green-500' },
+            { key: 'sci_applied', label: 'អនុវត្តន៍', max: 10, icon: 'wrench', color: 'text-green-500' },
+            { key: 'soc_ethic', label: 'សីលធម៌', max: 10, icon: 'heart-handshake', color: 'text-sky-500' },
+            { key: 'soc_geo', label: 'ភូមិវិទ្យា', max: 10, icon: 'map', color: 'text-sky-500' },
+            { key: 'soc_hist', label: 'ប្រវត្តិវិទ្យា', max: 10, icon: 'landmark', color: 'text-sky-500' },
+            { key: 'soc_home', label: 'គេហវិទ្យា', max: 10, icon: 'home', color: 'text-amber-500' },
+            { key: 'pe_sport', label: 'អប់រំកាយ', max: 10, icon: 'activity', color: 'text-amber-500' },
+            { key: 'health_hygiene', label: 'សុខភាព', max: 10, icon: 'shield-plus', color: 'text-amber-500' },
+            { key: 'life_skill', label: 'បំណិនជីវិត', max: 10, icon: 'lightbulb', color: 'text-blue-500' },
+            { key: 'foreign', label: 'ភាសាបរទេស', max: 10, icon: 'languages', color: 'text-purple-500' },
+            { key: 'ex_oral', label: 'ផ្ទាល់មាត់', max: 10, icon: 'speech', color: 'text-gray-400' },
+            { key: 'ex_att', label: 'អវត្តមាន', max: 10, icon: 'calendar-x', color: 'text-gray-400' },
+            { key: 'ex_book', label: 'សៀវភៅ', max: 10, icon: 'book', color: 'text-gray-400' },
+            { key: 'ex_hw', label: 'កិច្ចការផ្ទះ', max: 10, icon: 'home', color: 'text-gray-400' }
+        ];
+
+        const baseSemesterSubjects = [
+            { key: 'sem_kh_reading', label: 'អំណាន', max: 10, icon: 'book-open', color: 'text-purple-500' },
+            { key: 'sem_kh_listening_speaking', label: 'ស្តាប់-និយាយ', max: 10, icon: 'mic', color: 'text-purple-500' },
+            { key: 'sem_kh_dictation', label: 'សរសេរតាមអាន', max: 10, icon: 'pen-tool', color: 'text-purple-500' },
+            { key: 'sem_kh_essay', label: 'តែងសេចក្តី', max: 10, icon: 'file-text', color: 'text-purple-500' },
+            { key: 'sem_math', label: 'គណិតវិទ្យា', max: 10, icon: 'calculator', color: 'text-orange-500' },
+            { key: 'sem_science', label: 'វិទ្យាសាស្ត្រ', max: 10, icon: 'flask-conical', color: 'text-green-500' },
+            { key: 'sem_moral_civics', label: 'សីលធម៌', max: 10, icon: 'heart-handshake', color: 'text-sky-500' },
+            { key: 'sem_geo', label: 'ភូមិវិទ្យា', max: 10, icon: 'map', color: 'text-sky-500' },
+            { key: 'sem_hist', label: 'ប្រវត្តិវិទ្យា', max: 10, icon: 'landmark', color: 'text-sky-500' },
+            { key: 'sem_home_arts', label: 'គេហវិទ្យា', max: 10, icon: 'home', color: 'text-amber-500' },
+            { key: 'sem_life_skills', label: 'បំណិនជីវិត', max: 10, icon: 'lightbulb', color: 'text-blue-500' },
+            { key: 'sem_foreign', label: 'ភាសាបរទេស', max: 10, icon: 'languages', color: 'text-purple-500' },
+            { key: 'sem_sport', label: 'កីឡា', max: 10, icon: 'activity', color: 'text-amber-500' },
+            { key: 'sem_eval_knowledge', label: 'ចំណេះដឹង', isText: true, icon: 'brain', color: 'text-gray-400' },
+            { key: 'sem_eval_skill', label: 'បំណិន-ចំណេះធ្វើ', isText: true, icon: 'wrench', color: 'text-gray-400' },
+            { key: 'sem_eval_moral', label: 'តម្លៃ-សីលធម៌', isText: true, icon: 'heart', color: 'text-gray-400' },
+            { key: 'sem_eval_participate', label: 'សាមគ្គីភាព-ការចូលរួម', isText: true, icon: 'users', color: 'text-gray-400' }
+        ];
+
+        let activeMonthlySubjects = [...baseMonthlySubjects];
+        let activeSemesterSubjects = [...baseSemesterSubjects];
+
+        // Ensure Theme is applied
+        const initTheme = () => {
+            if (localStorage.getItem('theme') === 'light') {
+                document.body.classList.add('light-mode');
+            }
+        };
+
+        // UI Helpers
+        const setUIState = (state) => {
+            const loading = document.getElementById('loading-state');
+            const empty = document.getElementById('empty-state');
+            const results = document.getElementById('results-container');
+            
+            loading.classList.add('hidden');
+            empty.classList.add('hidden');
+            results.classList.add('hidden');
+            
+            if (state === 'loading') loading.classList.remove('hidden');
+            else if (state === 'empty') empty.classList.remove('hidden');
+            else if (state === 'results') results.classList.remove('hidden');
+            else if (state === 'results') results.classList.remove('hidden');
+            
+            lucide.createIcons();
+        };
+
+        window.updatePeriodOptions = () => {
+            const type = document.getElementById('typeSelect').value;
+            const periodSelect = document.getElementById('periodSelect');
+            periodSelect.innerHTML = '';
+            
+            if (type === 'monthly') {
+                const months = [
+                    { val: 'nov', label: 'ខែវិច្ឆិកា' }, { val: 'dec', label: 'ខែធ្នូ' },
+                    { val: 'jan', label: 'ខែមករា' }, { val: 'feb', label: 'ខែកុម្ភៈ' },
+                    { val: 'mar', label: 'ខែមីនា' }, { val: 'apr', label: 'ខែមេសា' },
+                    { val: 'may', label: 'ខែឧសភា' }, { val: 'jun', label: 'ខែមិថុនា' },
+                    { val: 'jul', label: 'ខែកក្កដា' }, { val: 'aug', label: 'ខែសីហា' },
+                    { val: 'sep', label: 'ខែកញ្ញា' }, { val: 'oct', label: 'ខែតុលា' }
+                ];
+                months.forEach(m => periodSelect.add(new Option(m.label, m.val)));
+            } else {
+                periodSelect.add(new Option('ឆមាសទី១', 'sem1'));
+                periodSelect.add(new Option('ឆមាសទី២', 'sem2'));
+            }
+            fetchScores();
+        };
+
+        const loadStudentProfile = async () => {
+            try {
+                const docRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'students', sid);
+                const snap = await getDoc(docRef);
+                if (snap.exists()) {
+                    const data = snap.data();
+                    document.getElementById('student-name').textContent = data.name || 'មិនស្គាល់ឈ្មោះ';
+                    document.getElementById('student-id').textContent = `ID: ${sid}`;
+                    const photoEl = document.getElementById('student-photo');
+                    photoEl.src = data.photo || `https://api.dicebear.com/7.x/notionists/svg?seed=${sid}`;
+                }
+            } catch (e) { console.error("Error loading profile", e); }
+        };
+
+        const loadCustomSubjects = async () => {
+            try {
+                const docRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'settings', 'custom_subjects');
+                const snap = await getDoc(docRef);
+                if (snap.exists() && snap.data().subjects) {
+                    const custom = snap.data().subjects;
+                    custom.forEach(sub => {
+                        sub.columns.forEach(col => {
+                            const newCol = { key: col.id, label: col.label, max: 10, icon: 'star', color: 'text-indigo-500' };
+                            if (sub.type === 'both' || sub.type === 'monthly') {
+                                if (!activeMonthlySubjects.find(c => c.key === col.id)) activeMonthlySubjects.push(newCol);
+                            }
+                            if (sub.type === 'both' || sub.type === 'semester') {
+                                if (!activeSemesterSubjects.find(c => c.key === col.id)) activeSemesterSubjects.push(newCol);
+                            }
+                        });
+                    });
+                }
+            } catch (e) { console.error("Error loading custom subjects", e); }
+        };
+
+        const loadAttendanceHistory = async () => {
+            try {
+                // Try fetching attendance data attached to the default class
+                const attRef = doc(db, "users", tid, "data", "class_default");
+                const snap = await getDoc(attRef);
+                if (snap.exists() && snap.data().attendanceHistory) {
+                    attendanceHistory = snap.data().attendanceHistory;
+                }
+            } catch (e) { console.error("Error loading attendance", e); }
+        };
+
+        const calculateGrade = (score, type) => {
+            let avg = score;
+            if (type === 'semester') avg = score / 10; // Simple normalize for display
+            if (avg >= 9.0) return 'A';
+            if (avg >= 8.0) return 'B';
+            if (avg >= 7.0) return 'C';
+            if (avg >= 6.0) return 'D';
+            if (avg >= 5.0) return 'E';
+            return 'F';
+        };
+
+        const getAttendanceStats = (period, type) => {
+            let absent = 0; let permission = 0; 
+            const monthStrs = {
+                'jan': '01', 'feb': '02', 'mar': '03', 'apr': '04',
+                'may': '05', 'jun': '06', 'jul': '07', 'aug': '08',
+                'sep': '09', 'oct': '10', 'nov': '11', 'dec': '12'
+            };
+            const sem1AttMonths = ['11', '12', '01', '02', '03', '04', '05'];
+            const sem2AttMonths = ['06', '07', '08', '09'];
+
+            Object.keys(attendanceHistory).forEach(dateStr => {
+                const parts = dateStr.split('-');
+                if (parts.length !== 3) return;
+                const m = parts[1];
+                let isMatch = false;
+                if (type === 'semester') {
+                    isMatch = period === 'sem1' ? sem1AttMonths.includes(m) : sem2AttMonths.includes(m);
+                } else {
+                    isMatch = m === monthStrs[period];
+                }
+                
+                if (isMatch) {
+                    const record = attendanceHistory[dateStr][sid];
+                    if (record) {
+                        if (record.status === 'A') absent++;       
+                        if (record.status === 'L') permission++;   
+                    }
+                }
+            });
+            return { absent, permission };
+        };
+
+        window.fetchScores = async () => {
+            setUIState('loading');
+            
+            const year = document.getElementById('yearSelect').value;
+            const type = document.getElementById('typeSelect').value;
+            const period = document.getElementById('periodSelect').value;
+            const docKey = `${year}_${period}`;
+
+            try {
+                // Fetch Scores Document (contains all students)
+                const scoreRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'scores', docKey);
+                const snap = await getDoc(scoreRef);
+                
+                let allData = snap.exists() ? snap.data() : {};
+                
+                // Fallback to old path if not found
+                if (Object.keys(allData).length === 0) {
+                    const oldRef = doc(db, "scores", docKey);
+                    const oldSnap = await getDoc(oldRef);
+                    if (oldSnap.exists()) allData = oldSnap.data();
+                }
+
+                const myRecord = allData[sid];
+                
+                if (!myRecord || (!myRecord.scores && Object.keys(myRecord).length === 0)) {
+                    setUIState('empty');
+                    return;
+                }
+
+                const studentScores = myRecord.hasOwnProperty('scores') ? myRecord.scores : myRecord;
+                const savedResults = myRecord.results || null;
+                
+                // Parse scores based on type
+                let activeSubjects = type === 'monthly' ? activeMonthlySubjects : activeSemesterSubjects;
+                let displayRows = [];
+                let manualTotal = 0;
+                let manualCount = 0;
+
+                activeSubjects.forEach(col => {
+                    let val = studentScores[col.key];
+                    if (val !== null && val !== undefined && val !== '') {
+                        if (col.isText) {
+                            displayRows.push({ ...col, valStr: val });
+                        } else {
+                            let numVal = parseFloat(val);
+                            if (!isNaN(numVal)) {
+                                displayRows.push({ ...col, valNum: numVal });
+                                manualTotal += numVal;
+                                manualCount++;
+                            }
+                        }
+                    }
+                });
+
+                if (displayRows.length === 0) {
+                    setUIState('empty');
+                    return;
+                }
+
+                // Values Calculation
+                let finalTotal = 0, finalAvg = 0, finalRank = '-', finalGrade = '-';
+                
+                if (savedResults) {
+                    finalTotal = parseFloat(savedResults.total || savedResults.examTotal || savedResults.semesterAverage * 10) || manualTotal;
+                    finalAvg = parseFloat(savedResults.average || savedResults.semesterAverage) || (manualCount > 0 ? manualTotal/manualCount : 0);
+                    finalRank = savedResults.rank || '-';
+                    finalGrade = savedResults.grade || '-';
+                } else {
+                    finalTotal = manualTotal;
+                    finalAvg = manualCount > 0 ? manualTotal/manualCount : 0;
+                    
+                    // Manual Rank Calculation
+                    let rankList = [];
+                    for (let id in allData) {
+                        if (id === 'metadata') continue;
+                        let rec = allData[id];
+                        let sc = rec.hasOwnProperty('scores') ? rec.scores : rec;
+                        let sTotal = 0, sCount = 0;
+                        activeSubjects.forEach(c => {
+                            if (!c.isText && sc[c.key]) {
+                                let v = parseFloat(sc[c.key]);
+                                if (!isNaN(v)) { sTotal += v; sCount++; }
+                            }
+                        });
+                        let avg = sCount > 0 ? sTotal/sCount : 0;
+                        rankList.push({ id, avg });
+                    }
+                    rankList.sort((a,b) => b.avg - a.avg);
+                    let rank = 1;
+                    for (let i = 0; i < rankList.length; i++) {
+                        if (i > 0 && rankList[i].avg < rankList[i-1].avg) rank = i + 1;
+                        if (rankList[i].id === sid) finalRank = rank;
+                    }
+                    
+                    finalGrade = calculateGrade(finalAvg, type);
+                }
+
+                // Update Overview Cards
+                document.getElementById('res-avg').textContent = Number.isInteger(finalAvg) ? finalAvg : finalAvg.toFixed(2).replace('.',',');
+                document.getElementById('res-total').textContent = Number.isInteger(finalTotal) ? finalTotal : finalTotal.toFixed(2).replace('.',',');
+                document.getElementById('res-rank').textContent = finalRank;
+                document.getElementById('res-grade').textContent = finalGrade;
+
+                // Update Subject List
+                document.getElementById('sub-count').textContent = `${displayRows.length} មុខវិជ្ជា`;
+                const subListEl = document.getElementById('subjects-list');
+                subListEl.innerHTML = '';
+                
+                displayRows.forEach(item => {
+                    const isText = item.isText;
+                    const valDisplay = isText ? item.valStr : (Number.isInteger(item.valNum) ? item.valNum : item.valNum.toFixed(2));
+                    const valClass = isText ? 'text-blue-400 text-xs' : 'font-bold text-gray-200 text-base';
+                    
+                    subListEl.innerHTML += `
+                        <div class="px-4 py-3 flex items-center justify-between hover:bg-gray-800/30 transition">
+                            <div class="flex items-center gap-3">
+                                <div class="bg-gray-800 p-2 rounded-lg"><i data-lucide="${item.icon}" class="w-4 h-4 ${item.color}"></i></div>
+                                <span class="text-sm font-semibold text-gray-300">${item.label}</span>
+                            </div>
+                            <span class="${valClass}">${valDisplay}</span>
+                        </div>
+                    `;
+                });
+
+                // Update Attendance
+                const attStats = getAttendanceStats(period, type);
+                document.getElementById('att-permission').textContent = attStats.permission;
+                document.getElementById('att-absent').textContent = attStats.absent;
+                document.getElementById('att-total').textContent = attStats.permission + attStats.absent;
+
+                // Generate Dynamic Teacher Comment based on Average
+                let commentText = "";
+                if (finalAvg <= 0) commentText = "មិនមានទិន្នន័យគ្រប់គ្រាន់";
+                else if (finalAvg < 5) commentText = "សិស្សរៀនក្រោមមធ្យម សូមមាតាបិតាជួយតាមដាន និងជំរុញឱ្យកូនខិតខំប្រឹងប្រែងរៀនសូត្របន្ថែមនៅផ្ទះផង។";
+                else if (finalAvg < 6) commentText = "សិស្សរៀនបាននិទ្ទេស E (មធ្យម) ត្រូវខិតខំប្រឹងប្រែងរៀនសូត្របន្ថែមទៀត ដើម្បីទទួលបានលទ្ធផលកាន់តែប្រសើរ។";
+                else if (finalAvg < 7) commentText = "សិស្សរៀនបាននិទ្ទេស D (ល្អបង្គួរ) មានការខិតខំប្រឹងប្រែង ត្រូវបន្តការអាន និងស្រាវជ្រាវបន្ថែមទៀត។";
+                else if (finalAvg < 8) commentText = "សិស្សរៀនបាននិទ្ទេស C (ល្អ) មានវិន័យ និងសីលធម៌ល្អ រៀនឆាប់យល់ និងមានការតស៊ូ។";
+                else if (finalAvg < 9) commentText = "សិស្សរៀនបាននិទ្ទេស B (ល្អណាស់) មានវិន័យ សីលធម៌ល្អ និងតែងតែជួយមិត្តភក្តិក្នុងការសិក្សា។";
+                else commentText = "សិស្សរៀនបាននិទ្ទេស A (ល្អប្រសើរ) មានវិន័យ សីលធម៌ល្អ ឆ្លាតវៃ និងជាគំរូល្អនៅក្នុងថ្នាក់រៀន។";
+
+                document.getElementById('teacher-comment').textContent = commentText;
+
+                setUIState('results');
+
+            } catch (error) {
+                console.error("Fetch Error:", error);
+                setUIState('empty');
+            }
+        };
+
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            lucide.createIcons();
+
+            if (!tid || !sid) {
+                alert("សូមចូលប្រព័ន្ធឡើងវិញ!");
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const initAuth = async () => {
+                try {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else if (!auth.currentUser) {
+                        await signInAnonymously(auth);
+                    }
+                } catch (error) {
+                    console.error("Auth error:", error);
+                }
+            };
+
+            initAuth().then(() => {
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        await loadStudentProfile();
+                        await loadCustomSubjects();
+                        await loadAttendanceHistory();
+                        updatePeriodOptions(); // This triggers fetchScores
+                    }
+                });
+            });
+        });
+
+    </script>
+</body>
+</html>
