@@ -26,7 +26,7 @@
         .pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 1rem); }
         .pt-safe { padding-top: max(env(safe-area-inset-top), 1rem); }
         
-        /* Custom Colors based on the screenshot */
+        /* Custom Colors */
         .bg-app-dark { background-color: #1c1c1e; transition: background-color 0.3s ease; }
         .bg-card-dark { background-color: #2c2c2e; transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; }
         .bg-header-green { 
@@ -60,6 +60,11 @@
         
         body.light-mode #settings-view .bg-gray-800 { background-color: #e5e7eb; }
 
+        /* Light Mode Specifics for Notification Modal */
+        body.light-mode #notification-modal .bg-gray-800\/30 { background-color: #f3f4f6; border-color: #e5e7eb; }
+        body.light-mode #notification-modal .bg-gray-800\/40 { background-color: #ffffff; border-color: #e5e7eb; }
+        body.light-mode #notification-modal .hover\:bg-gray-800\/60:hover { background-color: #f9fafb; }
+
         /* Blur background for login */
         .login-bg {
             background-image: url('https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=2022&auto=format&fit=crop');
@@ -82,7 +87,7 @@
         /* Grid Card Hover */
         .feature-card {
             transition: transform 0.2s ease, background-color 0.2s ease;
-            touch-action: manipulation; /* Improves mobile tap responsiveness */
+            touch-action: manipulation;
         }
         .feature-card:active {
             transform: scale(0.95);
@@ -110,7 +115,7 @@
 </head>
 <body class="bg-app-dark min-h-screen flex flex-col">
 
-    <!-- Loading Overlay (For initial data fetch) -->
+    <!-- Loading Overlay -->
     <div id="loading-overlay" class="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center transition-opacity duration-300">
         <div class="spinner w-12 h-12 mb-4 border-t-emerald-500"></div>
         <p class="text-white text-sm animate-pulse" id="loading-text">កំពុងរៀបចំទិន្នន័យ...</p>
@@ -185,20 +190,19 @@
         
         <!-- DASHBOARD VIEW -->
         <div id="dashboard-view" class="flex flex-col flex-1 w-full pb-20">
-            <!-- Header Profile Area (Green Background) -->
+            <!-- Header Profile Area -->
             <div class="bg-header-green pt-safe pb-6 px-6 rounded-b-[2rem] shadow-md relative z-20">
-                <!-- Top Nav: School Name & Notification Bell -->
                 <div class="flex justify-between items-start mb-6">
                     <div>
-                        <h2 class="text-white font-bold text-lg">សាលាបឋមសិក្សា</h2>
-                        <p class="text-emerald-100/80 text-xs">ឆ្នាំសិក្សា ២០២៥-២០២៦</p>
+                        <h2 id="header-school-name" class="text-white font-bold text-lg">សាលាបឋមសិក្សា</h2>
+                        <p id="header-academic-year" class="text-emerald-100/80 text-xs">ឆ្នាំសិក្សា ២០២៥-២០២៦</p>
                     </div>
                     
                     <!-- Notification Bell -->
                     <button onclick="toggleNotifications()" class="relative p-2 bg-white/10 rounded-full hover:bg-white/20 transition">
                         <i data-lucide="bell" class="w-6 h-6 text-white"></i>
                         <!-- Red dot badge -->
-                        <span class="absolute top-1.5 right-1.5 flex h-2.5 w-2.5">
+                        <span id="notif-badge" class="absolute top-1.5 right-1.5 flex h-2.5 w-2.5 hidden">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                             <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500 border border-emerald-800"></span>
                         </span>
@@ -228,43 +232,34 @@
 
             <!-- Main Grid Menu -->
             <div class="flex-1 px-5 -mt-2 pt-6 pb-6 relative z-10">
-                
-                <!-- Section 1: មុខងារតាមដាន -->
                 <h3 class="text-gray-400 text-sm font-semibold mb-4 px-1">មុខងារតាមដាន</h3>
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4" id="tracking-grid">
                     <!-- Grid items injected by JS -->
                 </div>
 
-                <!-- Section 2: ព័ត៌មានសិស្ស -->
                 <h3 class="text-gray-400 text-sm font-semibold mb-4 px-1 mt-8">ព័ត៌មានសិស្ស</h3>
                 <div class="grid grid-cols-2 gap-3 md:gap-4" id="info-grid">
                     <!-- Grid items injected by JS -->
                 </div>
-                
             </div>
         </div>
 
         <!-- SETTINGS VIEW (Hidden by default) -->
         <div id="settings-view" class="hidden flex-col flex-1 w-full pb-20 overflow-y-auto">
-            <!-- Settings Header -->
+            <!-- Settings Content omitted for brevity, identical to original -->
             <div class="bg-header-green pt-safe pb-6 px-6 relative z-20 overflow-hidden">
-                <!-- Optional background overlay to look like the school building in settings -->
                 <div class="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center mix-blend-overlay"></div>
                 <h1 class="text-white font-bold text-2xl kh-moul relative z-10 mt-4 mb-2">ការកំណត់</h1>
             </div>
 
-            <!-- Settings Options Content -->
             <div class="px-4 py-6 space-y-4 relative z-10">
-                
-                <!-- Section 1: Preferences -->
+                <!-- Preferences -->
                 <div class="bg-card-dark rounded-2xl p-4 shadow-sm border border-gray-800/50">
                     <div class="flex items-center gap-3 mb-4">
                         <div class="bg-gray-700/50 p-2 rounded-lg"><i data-lucide="sliders-horizontal" class="w-5 h-5 text-gray-300"></i></div>
                         <h3 class="font-bold text-gray-200 text-sm">ចំណូលចិត្ត</h3>
                     </div>
                     <div class="h-px w-full bg-gray-800 mb-4"></div>
-                    
-                    <!-- Dark Mode Toggle -->
                     <div class="flex justify-between items-center mb-5 cursor-pointer" onclick="toggleDarkMode()">
                         <div class="flex gap-4 items-center pl-1">
                             <i data-lucide="moon" id="dark-mode-icon" class="w-5 h-5 text-gray-400"></i>
@@ -277,8 +272,6 @@
                             <div id="dark-mode-circle" class="w-5 h-5 bg-white rounded-full absolute right-0.5 top-0.5 shadow-sm transition-transform duration-300"></div>
                         </div>
                     </div>
-
-                    <!-- Language -->
                     <div class="flex justify-between items-center">
                         <div class="flex gap-4 items-center pl-1">
                             <i data-lucide="languages" class="w-5 h-5 text-gray-400"></i>
@@ -291,15 +284,13 @@
                     </div>
                 </div>
 
-                <!-- Section 2: Account Security -->
+                <!-- Account Security -->
                 <div class="bg-card-dark rounded-2xl p-4 shadow-sm border border-gray-800/50">
                     <div class="flex items-center gap-3 mb-4">
                         <div class="bg-gray-700/50 p-2 rounded-lg"><i data-lucide="shield" class="w-5 h-5 text-gray-300"></i></div>
                         <h3 class="font-bold text-gray-200 text-sm">សុវត្ថិភាពគណនី</h3>
                     </div>
                     <div class="h-px w-full bg-gray-800 mb-4"></div>
-                    
-                    <!-- Teacher Code -->
                     <div class="flex justify-between items-center mb-5">
                         <div class="flex gap-4 items-center pl-1">
                             <i data-lucide="key" class="w-5 h-5 text-gray-400"></i>
@@ -309,8 +300,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Student Code -->
                     <div class="flex justify-between items-center">
                         <div class="flex gap-4 items-center pl-1">
                             <i data-lucide="user" class="w-5 h-5 text-gray-400"></i>
@@ -322,7 +311,7 @@
                     </div>
                 </div>
 
-                <!-- Section 3: Account Management -->
+                <!-- Account Management -->
                 <div class="bg-card-dark rounded-2xl p-4 shadow-sm border border-gray-800/50 cursor-pointer" onclick="logout()">
                     <div class="flex items-center gap-3 mb-4">
                         <div class="bg-gray-700/50 p-2 rounded-lg"><i data-lucide="user-cog" class="w-5 h-5 text-gray-300"></i></div>
@@ -340,7 +329,6 @@
                         <i data-lucide="chevron-right" class="w-5 h-5 text-gray-500"></i>
                     </div>
                 </div>
-
             </div>
         </div>
 
@@ -355,6 +343,34 @@
                     <i data-lucide="settings" class="w-6 h-6"></i>
                     <span class="text-[10px] font-bold">Setting</span>
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTIFICATION MODAL (NEW) -->
+    <div id="notification-modal" class="fixed inset-0 z-[70] hidden flex-col justify-end sm:justify-center items-center px-0 sm:px-4 pb-0 sm:pb-4 transition-opacity duration-300 opacity-0">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="toggleNotifications()"></div>
+        <div class="bg-card-dark w-full sm:max-w-md rounded-t-[2rem] sm:rounded-[2rem] border border-gray-700 relative z-10 shadow-2xl flex flex-col max-h-[85vh] transform transition-transform duration-300 translate-y-full sm:translate-y-0" id="notification-content">
+            <div class="p-6 border-b border-gray-700/50 flex justify-between items-center bg-gray-800/30 rounded-t-[2rem] sm:rounded-t-[2rem]">
+                <div class="flex items-center gap-3">
+                    <div class="bg-emerald-500/20 p-2.5 rounded-xl text-emerald-400">
+                        <i data-lucide="bell-ring" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-white font-bold text-lg kh-moul leading-tight">ការជូនដំណឹង</h3>
+                        <p class="text-xs text-gray-400 mt-0.5">សារពីលោកគ្រូ អ្នកគ្រូ</p>
+                    </div>
+                </div>
+                <button onclick="toggleNotifications()" class="text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 p-2 rounded-full transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div id="notification-list" class="flex-1 overflow-y-auto p-5 space-y-3 custom-scrollbar">
+                <!-- Fetching state -->
+                <div class="text-center py-10">
+                    <div class="spinner w-8 h-8 mx-auto border-t-emerald-500 mb-4"></div>
+                    <p class="text-gray-400 text-sm">កំពុងទាញយក...</p>
+                </div>
             </div>
         </div>
     </div>
@@ -385,7 +401,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Firebase Configuration
         const firebaseConfig = {
@@ -408,6 +424,8 @@
         let loggedInStudent = null;
         let isIdVisible = false;
         let realId = "";
+        let unsubNotifications = null; // Unsubscriber for notifications
+        let currentNotifs = []; // Store fetched notifications
 
         // UI Elements
         const loadingOverlay = document.getElementById('loading-overlay');
@@ -438,22 +456,8 @@
         trackingFeatures.forEach(feature => {
             const card = document.createElement('button');
             card.className = 'feature-card bg-card-dark p-4 rounded-2xl flex flex-col items-center justify-center text-center border border-gray-700/50 shadow-sm gap-3';
-            
-            // Fixed Link Navigation Logic
-            card.onclick = () => {
-                if(feature.url) {
-                    window.location.href = feature.url;
-                } else {
-                    alert(`មុខងារ ${feature.name} មិនទាន់ដំណើរការនៅឡើយទេ!`);
-                }
-            };
-            
-            card.innerHTML = `
-                <div class="${feature.bgColor} p-3.5 rounded-2xl w-14 h-14 flex items-center justify-center">
-                    <i data-lucide="${feature.icon}" class="w-7 h-7 ${feature.color}"></i>
-                </div>
-                <h3 class="text-gray-200 text-xs font-semibold leading-tight">${feature.name}</h3>
-            `;
+            card.onclick = () => { if(feature.url) window.location.href = feature.url; else alert(`មុខងារ ${feature.name} មិនទាន់ដំណើរការនៅឡើយទេ!`); };
+            card.innerHTML = `<div class="${feature.bgColor} p-3.5 rounded-2xl w-14 h-14 flex items-center justify-center"><i data-lucide="${feature.icon}" class="w-7 h-7 ${feature.color}"></i></div><h3 class="text-gray-200 text-xs font-semibold leading-tight">${feature.name}</h3>`;
             trackingGrid.appendChild(card);
         });
 
@@ -461,21 +465,8 @@
         infoFeatures.forEach(feature => {
             const card = document.createElement('button');
             card.className = 'feature-card bg-card-dark p-4 rounded-2xl flex flex-col items-center justify-center text-center border border-gray-700/50 shadow-sm gap-3';
-            
-            card.onclick = () => {
-                if(feature.url) {
-                    window.location.href = feature.url;
-                } else {
-                    alert(`មុខងារ ${feature.name} មិនទាន់ដំណើរការនៅឡើយទេ!`);
-                }
-            };
-            
-            card.innerHTML = `
-                <div class="${feature.bgColor} p-3.5 rounded-2xl w-14 h-14 flex items-center justify-center">
-                    <i data-lucide="${feature.icon}" class="w-7 h-7 ${feature.color}"></i>
-                </div>
-                <h3 class="text-gray-200 text-xs font-semibold leading-tight">${feature.name}</h3>
-            `;
+            card.onclick = () => { if(feature.url) window.location.href = feature.url; else alert(`មុខងារ ${feature.name} មិនទាន់ដំណើរការនៅឡើយទេ!`); };
+            card.innerHTML = `<div class="${feature.bgColor} p-3.5 rounded-2xl w-14 h-14 flex items-center justify-center"><i data-lucide="${feature.icon}" class="w-7 h-7 ${feature.color}"></i></div><h3 class="text-gray-200 text-xs font-semibold leading-tight">${feature.name}</h3>`;
             infoGrid.appendChild(card);
         });
 
@@ -493,13 +484,13 @@
             if (isDarkMode) {
                 toggle.classList.remove('bg-gray-400');
                 toggle.classList.add('bg-emerald-500');
-                circle.classList.remove('-translate-x-4'); // Move to right
+                circle.classList.remove('-translate-x-4');
                 if(text) text.textContent = 'កំពុងប្រើ Dark Mode';
                 if(icon) icon.setAttribute('data-lucide', 'moon');
             } else {
                 toggle.classList.remove('bg-emerald-500');
                 toggle.classList.add('bg-gray-400');
-                circle.classList.add('-translate-x-4'); // Move to left
+                circle.classList.add('-translate-x-4');
                 if(text) text.textContent = 'កំពុងប្រើ Light Mode';
                 if(icon) icon.setAttribute('data-lucide', 'sun');
             }
@@ -518,24 +509,18 @@
             updateDarkModeUI();
         };
 
-        // Initialize Theme smoothly
-        if (!isDarkMode) {
-            document.body.classList.add('light-mode');
-        }
+        if (!isDarkMode) document.body.classList.add('light-mode');
         updateDarkModeUI();
 
 
-        // Check if user came from QR scan URL
+        // Check Auth Status
         const urlParams = new URLSearchParams(window.location.search);
         const urlTeacherId = urlParams.get('tid');
         const urlStudentId = urlParams.get('sid');
 
-        // Check Auth Status initially
         const initAuth = async () => {
             try {
-                if (!auth.currentUser) {
-                    await signInAnonymously(auth);
-                }
+                if (!auth.currentUser) await signInAnonymously(auth);
             } catch (error) {
                 console.error("Auth error:", error);
                 showLogin();
@@ -558,7 +543,6 @@
             });
         });
 
-        // Function to Fetch Data & Login
         async function attemptLogin(tid, sid) {
             loginError.classList.add('hidden');
             const originalBtnHtml = btnLogin.innerHTML;
@@ -566,6 +550,7 @@
             btnLogin.disabled = true;
 
             try {
+                // ១. ទាញយកទិន្នន័យសិស្ស
                 const studentRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'students', sid);
                 const studentSnap = await getDoc(studentRef);
 
@@ -577,7 +562,26 @@
                     localStorage.setItem('savedTid', tid);
                     localStorage.setItem('savedSid', sid);
 
+                    // ២. ទាញយកឈ្មោះសាលា និងឆ្នាំសិក្សាពី Profile របស់លោកគ្រូអ្នកគ្រូ
+                    try {
+                        const profileRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'profile', 'data');
+                        const profileSnap = await getDoc(profileRef);
+                        
+                        if (profileSnap.exists()) {
+                            const pData = profileSnap.data();
+                            if (pData.school_name_admin) {
+                                document.getElementById('header-school-name').textContent = pData.school_name_admin;
+                            }
+                            if (pData.academic_year) {
+                                document.getElementById('header-academic-year').textContent = "ឆ្នាំសិក្សា " + pData.academic_year;
+                            }
+                        }
+                    } catch (profErr) {
+                        console.error("Failed to fetch teacher's profile for school name:", profErr);
+                    }
+
                     updateDashboardUI(loggedInStudent, tid, sid);
+                    listenToNotifications(tid, sid); // Start fetching notifications
                     hideLoginShowDashboard();
                 } else {
                     console.warn("Student not found");
@@ -601,12 +605,116 @@
             e.preventDefault();
             const tCode = teacherCodeInput.value.trim();
             const sCode = studentCodeInput.value.trim();
-            
-            if(tCode && sCode) {
-                attemptLogin(tCode, sCode);
-            }
+            if(tCode && sCode) attemptLogin(tCode, sCode);
         });
 
+        // --- NOTIFICATIONS LOGIC ---
+        function listenToNotifications(tid, sid) {
+            const notifRef = collection(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'notifications');
+            
+            if (unsubNotifications) unsubNotifications(); // Clear old listener
+
+            unsubNotifications = onSnapshot(notifRef, (snap) => {
+                currentNotifs = [];
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    if (data.target === 'all' || data.target === sid) {
+                        currentNotifs.push({ id: doc.id, ...data });
+                    }
+                });
+
+                // Sort newest first
+                currentNotifs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                renderNotifications();
+            }, (error) => {
+                console.error("Error fetching notifications:", error);
+                document.getElementById('notification-list').innerHTML = `<div class="text-center py-10 text-red-400 text-sm">មានបញ្ហាក្នុងការទាញយកទិន្នន័យ</div>`;
+            });
+        }
+
+        function renderNotifications() {
+            const listEl = document.getElementById('notification-list');
+            const badge = document.getElementById('notif-badge');
+
+            // Filter out dismissed notifications for this student
+            let dismissedNotifs = JSON.parse(localStorage.getItem('dismissedNotifs_' + realId) || '[]');
+            let visibleNotifs = currentNotifs.filter(n => !dismissedNotifs.includes(n.id));
+
+            if (visibleNotifs.length === 0) {
+                listEl.innerHTML = `<div class="text-center py-12 text-gray-500"><i data-lucide="bell-off" class="w-12 h-12 mx-auto mb-3 opacity-20"></i><p class="text-sm">មិនមានការជូនដំណឹងថ្មីទេ</p></div>`;
+                if (badge) badge.classList.add('hidden');
+                lucide.createIcons();
+                return;
+            }
+
+            // Show badge if there are notifications
+            if (badge) badge.classList.remove('hidden');
+
+            let html = '';
+            visibleNotifs.forEach(n => {
+                let icon = 'info', colorClass = 'text-blue-400 bg-blue-500/10 border-blue-500/20';
+                if (n.type === 'alert') { icon = 'alert-triangle'; colorClass = 'text-red-400 bg-red-500/10 border-red-500/20'; }
+                if (n.type === 'success') { icon = 'award'; colorClass = 'text-green-400 bg-green-500/10 border-green-500/20'; }
+
+                const d = new Date(n.createdAt);
+                const dateStr = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+
+                html += `
+                    <div id="notif-${n.id}" class="bg-gray-800/40 p-4 rounded-2xl border border-gray-700/50 hover:bg-gray-800/60 transition relative group">
+                        <button onclick="dismissNotification('${n.id}')" class="absolute top-3 right-3 p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-full transition opacity-100 sm:opacity-0 sm:group-hover:opacity-100" title="លុបការជូនដំណឹងនេះ">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                        <div class="flex gap-4 pr-6">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${colorClass}">
+                                <i data-lucide="${icon}" class="w-5 h-5"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-bold text-gray-200 text-sm mb-1">${n.title}</h4>
+                                <p class="text-xs text-gray-400 leading-relaxed mb-2">${n.message}</p>
+                                <span class="text-[10px] text-gray-500 font-mono"><i data-lucide="clock" class="w-3 h-3 inline mr-1"></i>${dateStr}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            listEl.innerHTML = html;
+            lucide.createIcons();
+        }
+
+        window.dismissNotification = function(notifId) {
+            let dismissedNotifs = JSON.parse(localStorage.getItem('dismissedNotifs_' + realId) || '[]');
+            if (!dismissedNotifs.includes(notifId)) {
+                dismissedNotifs.push(notifId);
+                localStorage.setItem('dismissedNotifs_' + realId, JSON.stringify(dismissedNotifs));
+            }
+            renderNotifications(); // Re-render to immediately hide it
+        }
+
+        window.toggleNotifications = function() {
+            const notifModal = document.getElementById('notification-modal');
+            const notifContent = document.getElementById('notification-content');
+            
+            if(notifModal.classList.contains('hidden')) {
+                notifModal.classList.remove('hidden');
+                notifModal.classList.add('flex');
+                
+                // Slight delay to allow display to apply before triggering opacity/transform transition
+                setTimeout(() => {
+                    notifModal.classList.remove('opacity-0');
+                    notifContent.classList.remove('translate-y-full');
+                }, 10);
+            } else {
+                notifModal.classList.add('opacity-0');
+                notifContent.classList.add('translate-y-full');
+                
+                setTimeout(() => {
+                    notifModal.classList.add('hidden');
+                    notifModal.classList.remove('flex');
+                }, 300); // Wait for transition
+            }
+        }
+
+        // --- DASHBOARD UI ---
         function updateDashboardUI(student, tid, sid) {
             document.getElementById('display-name').textContent = student.name || 'មិនស្គាល់ឈ្មោះ';
             document.getElementById('display-gender').textContent = student.gender || '-';
@@ -622,12 +730,8 @@
             document.getElementById('display-id').textContent = "***";
             document.getElementById('eye-icon').setAttribute('data-lucide', 'eye');
             
-            if (document.getElementById('setting-tid')) {
-                document.getElementById('setting-tid').textContent = tid || '***';
-            }
-            if (document.getElementById('setting-sid')) {
-                document.getElementById('setting-sid').textContent = sid || '***';
-            }
+            if (document.getElementById('setting-tid')) document.getElementById('setting-tid').textContent = tid || '***';
+            if (document.getElementById('setting-sid')) document.getElementById('setting-sid').textContent = sid || '***';
 
             lucide.createIcons();
         }
@@ -662,25 +766,17 @@
             const btnSettings = document.getElementById('tab-btn-settings');
 
             if (tabName === 'dashboard') {
-                dashboardView.classList.remove('hidden');
-                dashboardView.classList.add('flex');
-                settingsView.classList.add('hidden');
-                settingsView.classList.remove('flex');
+                dashboardView.classList.remove('hidden'); dashboardView.classList.add('flex');
+                settingsView.classList.add('hidden'); settingsView.classList.remove('flex');
 
-                btnDashboard.classList.add('text-emerald-500');
-                btnDashboard.classList.remove('text-gray-500');
-                btnSettings.classList.remove('text-emerald-500');
-                btnSettings.classList.add('text-gray-500');
+                btnDashboard.classList.add('text-emerald-500'); btnDashboard.classList.remove('text-gray-500');
+                btnSettings.classList.remove('text-emerald-500'); btnSettings.classList.add('text-gray-500');
             } else if (tabName === 'settings') {
-                settingsView.classList.remove('hidden');
-                settingsView.classList.add('flex');
-                dashboardView.classList.add('hidden');
-                dashboardView.classList.remove('flex');
+                settingsView.classList.remove('hidden'); settingsView.classList.add('flex');
+                dashboardView.classList.add('hidden'); dashboardView.classList.remove('flex');
 
-                btnSettings.classList.add('text-emerald-500');
-                btnSettings.classList.remove('text-gray-500');
-                btnDashboard.classList.remove('text-emerald-500');
-                btnDashboard.classList.add('text-gray-500');
+                btnSettings.classList.add('text-emerald-500'); btnSettings.classList.remove('text-gray-500');
+                btnDashboard.classList.remove('text-emerald-500'); btnDashboard.classList.add('text-gray-500');
             }
         };
 
@@ -689,6 +785,11 @@
                 localStorage.removeItem('savedTid');
                 localStorage.removeItem('savedSid');
                 
+                if (unsubNotifications) {
+                    unsubNotifications();
+                    unsubNotifications = null;
+                }
+
                 window.history.replaceState({}, document.title, window.location.pathname);
                 
                 teacherCodeInput.value = '';
@@ -696,6 +797,10 @@
                 
                 if (document.getElementById('setting-tid')) document.getElementById('setting-tid').textContent = '***';
                 if (document.getElementById('setting-sid')) document.getElementById('setting-sid').textContent = '***';
+                
+                // Reset School Info headers to default upon logout
+                document.getElementById('header-school-name').textContent = 'សាលាបឋមសិក្សា';
+                document.getElementById('header-academic-year').textContent = 'ឆ្នាំសិក្សា ២០២៥-២០២៦';
                 
                 switchTab('dashboard');
 
@@ -713,23 +818,9 @@
             isIdVisible = !isIdVisible;
             document.getElementById('display-id').textContent = isIdVisible ? realId : "***";
             const eyeIcon = document.getElementById('eye-icon');
-            if(isIdVisible) {
-                eyeIcon.setAttribute('data-lucide', 'eye-off');
-            } else {
-                eyeIcon.setAttribute('data-lucide', 'eye');
-            }
+            if(isIdVisible) eyeIcon.setAttribute('data-lucide', 'eye-off');
+            else eyeIcon.setAttribute('data-lucide', 'eye');
             lucide.createIcons();
-        }
-
-        window.toggleNotifications = function() {
-            const notifModal = document.getElementById('notification-modal');
-            if(notifModal.classList.contains('hidden')) {
-                notifModal.classList.remove('hidden');
-                notifModal.classList.add('flex');
-            } else {
-                notifModal.classList.add('hidden');
-                notifModal.classList.remove('flex');
-            }
         }
 
         // --- In-App QR Code Scanner Logic ---
@@ -750,18 +841,12 @@
                 content.classList.add('scale-100', 'opacity-100');
             }, 10);
 
-            // Initialize Scanner
-            if (!html5QrCode) {
-                html5QrCode = new Html5Qrcode("qr-reader");
-            }
+            if (!html5QrCode) html5QrCode = new Html5Qrcode("qr-reader");
 
-            // Start scanning with rear camera
             const config = { fps: 10, qrbox: { width: 250, height: 250 } };
             
             html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
-                .then(() => {
-                    statusText.textContent = "កំពុងស្កេន...";
-                })
+                .then(() => { statusText.textContent = "កំពុងស្កេន..."; })
                 .catch((err) => {
                     console.error("Camera start failed:", err);
                     statusText.textContent = "មិនអាចបើកកាមេរ៉ាបានទេ! សូមពិនិត្យមើលសិទ្ធិអនុញ្ញាតកាមេរ៉ា (Camera Permissions) នៅលើ Browser របស់អ្នក។";
@@ -771,7 +856,6 @@
 
         function onScanSuccess(decodedText, decodedResult) {
             try {
-                // Parse the URL from the QR code (Example: https://.../?tid=xxx&sid=yyy)
                 const url = new URL(decodedText);
                 const tid = url.searchParams.get('tid');
                 const sid = url.searchParams.get('sid');
@@ -781,14 +865,10 @@
                     statusText.textContent = "ស្កេនបានជោគជ័យ! កំពុងចូល...";
                     statusText.className = "text-emerald-500 text-xs text-center mt-4 font-bold";
                     
-                    // Fill the input forms
                     document.getElementById('teacher-code').value = tid;
                     document.getElementById('student-code').value = sid;
 
-                    // Stop scanner and attempt login
-                    closeQRScanner().then(() => {
-                        attemptLogin(tid, sid);
-                    });
+                    closeQRScanner().then(() => attemptLogin(tid, sid));
                 } else {
                     throw new Error("Invalid format");
                 }
@@ -807,16 +887,13 @@
                 content.classList.remove('scale-100', 'opacity-100');
                 content.classList.add('scale-95', 'opacity-0');
                 
-                // Properly stop camera stream if it is running
                 const stopScanner = () => {
-                    if (html5QrCode && html5QrCode.getState() === 2) { // 2 = SCANNING
+                    if (html5QrCode && html5QrCode.getState() === 2) {
                         html5QrCode.stop().then(() => {
                             html5QrCode.clear();
                             finishClose();
                         }).catch(finishClose);
-                    } else {
-                        finishClose();
-                    }
+                    } else finishClose();
                 };
 
                 const finishClose = () => {
@@ -830,7 +907,6 @@
                 stopScanner();
             });
         }
-        
     </script>
     <script src="pwa-install.js"></script>
 </body>
