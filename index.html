@@ -9,923 +9,276 @@
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;600;700&family=Moul&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-    <style>
-        body { 
-            font-family: 'Kantumruy Pro', sans-serif; 
-            background-color: #121212; /* Dark theme background */
-            color: #ffffff;
-            margin: 0; 
-            padding: 0; 
-            overflow-x: hidden; 
-            transition: background-color 0.3s ease, color 0.3s ease;
-            -webkit-tap-highlight-color: transparent; /* Fix for mobile tap highlight */
-        }
-        .kh-moul { font-family: 'Moul', cursive; }
-        
-        /* Mobile Safe Areas */
-        .pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 1rem); }
-        .pt-safe { padding-top: max(env(safe-area-inset-top), 1rem); }
-        
-        /* Custom Colors */
-        .bg-app-dark { background-color: #1c1c1e; transition: background-color 0.3s ease; }
-        .bg-card-dark { background-color: #2c2c2e; transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; }
-        .bg-header-green { 
-            background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
-        }
-        
-        /* Light Mode Adjustments */
-        body.light-mode { background-color: #f9fafb; color: #1f2937; }
-        body.light-mode .bg-app-dark { background-color: #f9fafb; }
-        body.light-mode .bg-card-dark { background-color: #ffffff; border-color: #e5e7eb; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
-        
-        body.light-mode .bg-gray-700\/50 { background-color: #f3f4f6; }
-        body.light-mode .border-gray-800\/50 { border-color: #e5e7eb; }
-        body.light-mode .border-gray-700 { border-color: #e5e7eb; }
-        body.light-mode .bg-\[\#1c1c1e\]\/95 { background-color: rgba(255,255,255,0.95); border-top-color: #e5e7eb; }
-        body.light-mode .bg-\[\#1c1c1e\] { background-color: #ffffff; border-color: #e5e7eb; }
-        
-        body.light-mode .feature-card h3,
-        body.light-mode #settings-view h3,
-        body.light-mode #settings-view p.text-gray-200,
-        body.light-mode #notification-modal h3,
-        body.light-mode #notification-modal h4,
-        body.light-mode #qr-scanner-modal h3 { color: #111827; }
-
-        body.light-mode #settings-view p.text-gray-400,
-        body.light-mode #notification-modal p.text-gray-400,
-        body.light-mode #qr-scanner-modal p.text-gray-400 { color: #6b7280; }
-        
-        body.light-mode #settings-view i.text-gray-300,
-        body.light-mode #settings-view i.text-gray-400 { color: #6b7280; }
-        
-        body.light-mode #settings-view .bg-gray-800 { background-color: #e5e7eb; }
-
-        /* Light Mode Specifics for Notification Modal */
-        body.light-mode #notification-modal .bg-gray-800\/30 { background-color: #f3f4f6; border-color: #e5e7eb; }
-        body.light-mode #notification-modal .bg-gray-800\/40 { background-color: #ffffff; border-color: #e5e7eb; }
-        body.light-mode #notification-modal .hover\:bg-gray-800\/60:hover { background-color: #f9fafb; }
-
-        /* Blur background for login */
-        .login-bg {
-            background-image: url('https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=2022&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
-        }
-        .login-overlay {
-            background: rgba(0, 0, 0, 0.65);
-            backdrop-filter: blur(8px);
-        }
-
-        /* Glassmorphism for Login Box */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 1.5rem;
-        }
-
-        /* Grid Card Hover */
-        .feature-card {
-            transition: transform 0.2s ease, background-color 0.2s ease;
-            touch-action: manipulation;
-        }
-        .feature-card:active {
-            transform: scale(0.95);
-            background-color: #3a3a3c;
-        }
-
-        /* Hide scrollbar */
-        ::-webkit-scrollbar { display: none; }
-        
-        /* Loader Loader */
-        .spinner {
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top: 3px solid #10b981; /* emerald-500 */
-            width: 24px;
-            height: 24px;
-            -webkit-animation: spin 1s linear infinite; /* Safari */
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Notification Animation */
-        .notif-card-enter {
-            animation: slideIn 0.4s ease-out forwards;
-        }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
+    
+    <link rel="stylesheet" href="style_index/style.css">
 </head>
 <body class="bg-app-dark min-h-screen flex flex-col">
 
-    <!-- Loading Overlay -->
-    <div id="loading-overlay" class="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center transition-opacity duration-300">
+    <div id="loading-overlay" role="alert" aria-busy="true" class="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center transition-opacity duration-300">
         <div class="spinner w-12 h-12 mb-4 border-t-emerald-500"></div>
-        <p class="text-white text-sm animate-pulse" id="loading-text">កំពុងរៀបចំទិន្នន័យ...</p>
+        <p class="text-white text-sm animate-pulse" id="loading-text" data-i18n="loading_data">កំពុងរៀបចំទិន្នន័យ...</p>
     </div>
 
-    <!-- ================= AUTH SECTION (LOGIN) ================= -->
-    <div id="auth-section" class="fixed inset-0 z-50 flex flex-col items-center justify-center login-bg transition-opacity duration-500 hidden opacity-0">
+    <main id="auth-section" class="fixed inset-0 z-50 flex flex-col items-center justify-center login-bg transition-opacity duration-500 hidden opacity-0" aria-hidden="true">
         <div class="absolute inset-0 login-overlay"></div>
         
         <div class="relative z-10 w-full max-w-sm px-6 flex flex-col items-center">
             <div class="bg-white/10 p-4 rounded-3xl backdrop-blur-md border border-white/20 mb-6 shadow-2xl">
                 <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-inner">
-                    <i data-lucide="graduation-cap" class="w-10 h-10 text-emerald-700"></i>
+                    <i data-lucide="graduation-cap" class="w-10 h-10 text-emerald-700" aria-hidden="true"></i>
                 </div>
             </div>
             
             <h1 class="text-3xl font-bold text-white mb-2">Parent Portal</h1>
-            <p class="text-gray-300 text-sm mb-8">សម្រាប់អាណាព្យាបាលសិស្សបឋមសិក្សា</p>
+            <p class="text-gray-300 text-sm mb-8" data-i18n="auth_subtitle">សម្រាប់អាណាព្យាបាលសិស្ស</p>
 
-            <!-- Login Form -->
             <div class="glass-card w-full p-6 shadow-2xl">
-                <form id="login-form" class="space-y-5">
+                <form id="login-form" class="space-y-4" novalidate>
                     
-                    <div class="space-y-1.5">
-                        <label class="text-sm font-semibold text-gray-200 ml-1">លេខកូដថ្នាក់រៀន</label>
+                    <div class="space-y-1">
+                        <label for="teacher-code" class="text-sm font-semibold text-gray-200 ml-1 block" data-i18n="class_code_label">លេខកូដថ្នាក់រៀន</label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i data-lucide="key" class="w-5 h-5 text-gray-400"></i>
+                                <i data-lucide="key" class="w-5 h-5 text-gray-400" aria-hidden="true"></i>
                             </div>
-                            <input value="KS9lutduPQZambSiLyZzFgh0xDh1" type="text" id="teacher-code" required placeholder="បញ្ចូលលេខកូដថ្នាក់..." 
-                                class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white/20 transition mb-3">
-                        </div>
-                        
-                        <label class="text-sm font-semibold text-gray-200 ml-1">អត្តលេខសិស្ស</label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i data-lucide="user" class="w-5 h-5 text-gray-400"></i>
-                            </div>
-                            <input type="text" id="student-code" required placeholder="បញ្ចូលអត្តលេខកូន..." 
+                            <input value="KS9lutduPQZambSiLyZzFgh0xDh1" type="text" id="teacher-code" required placeholder="ឧទាហរណ៍៖ KS9lut..." aria-describedby="teacher-helper teacher-error" data-i18n-placeholder="placeholder_teacher"
                                 class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white/20 transition">
                         </div>
+                        <p id="teacher-helper" class="text-[11px] text-gray-300 ml-1" data-i18n="class_code_helper">សួរគ្រូរបស់អ្នកសម្រាប់លេខកូដនេះ</p>
+                        <p id="teacher-error" class="text-[11px] text-red-400 ml-1 hidden" role="alert"></p>
                     </div>
                     
-                    <div id="login-error" class="hidden bg-red-500/20 text-red-200 border border-red-500/50 p-2.5 rounded-lg text-xs text-center">
-                        ព័ត៌មានមិនត្រឹមត្រូវ សូមពិនិត្យម្តងទៀត។
+                    <div class="space-y-1">
+                        <label for="student-code" class="text-sm font-semibold text-gray-200 ml-1 block" data-i18n="student_id_label">អត្តលេខសិស្ស</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i data-lucide="user" class="w-5 h-5 text-gray-400" aria-hidden="true"></i>
+                            </div>
+                            <input type="text" id="student-code" required placeholder="ឧទាហរណ៍៖ STU001" aria-describedby="student-helper student-error" data-i18n-placeholder="placeholder_student"
+                                class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white/20 transition">
+                        </div>
+                        <p id="student-helper" class="text-[11px] text-gray-300 ml-1" data-i18n="student_id_helper">អត្តលេខសម្គាល់កូនរបស់អ្នក</p>
+                        <p id="student-error" class="text-[11px] text-red-400 ml-1 hidden" role="alert"></p>
+                    </div>
+                    
+                    <div id="login-error" class="hidden bg-red-500/20 text-red-100 border border-red-500/50 p-3 rounded-lg text-xs text-center flex items-center gap-2" role="alert">
+                        <i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i>
+                        <span id="login-error-text" data-i18n="login_error_default">ព័ត៌មានមិនត្រឹមត្រូវ។</span>
                     </div>
 
-                    <div class="flex gap-3 pt-2">
-                        <!-- Scan Button -->
-                        <button type="button" onclick="scanQR()" style="touch-action: manipulation;" class="flex-[0.3] flex flex-col items-center justify-center bg-gray-700/50 hover:bg-gray-600/50 border border-gray-500/50 text-white py-2.5 rounded-xl transition cursor-pointer">
-                            <i data-lucide="qr-code" class="w-6 h-6 mb-1"></i>
-                            <span class="text-[10px] font-bold">ស្កេន</span>
+                    <div class="flex flex-col sm:flex-row gap-3 pt-4">
+                        <button type="button" onclick="scanQR()" aria-label="ស្កេន QR Code" class="flex-1 sm:flex-[0.4] flex items-center justify-center gap-2 bg-gray-700/50 hover:bg-gray-600/50 border border-gray-500/50 text-white py-3 rounded-xl transition cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none">
+                            <i data-lucide="qr-code" class="w-5 h-5"></i>
+                            <span class="text-sm font-bold sm:hidden" data-i18n="scan_qr_btn">ស្កេន QR</span>
                         </button>
                         
-                        <!-- Login Button -->
-                        <button type="submit" id="btn-login" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition shadow-lg flex items-center justify-center gap-2">
-                            <span>ចូលប្រើប្រាស់</span>
-                            <i data-lucide="log-in" class="w-5 h-5"></i>
+                        <button type="submit" id="btn-login" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition shadow-lg flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-white outline-none disabled:opacity-70 disabled:cursor-not-allowed">
+                            <span id="btn-login-text" data-i18n="login_btn">ចូលប្រើប្រាស់</span>
+                            <i data-lucide="log-in" id="btn-login-icon" class="w-5 h-5"></i>
                         </button>
                     </div>
                 </form>
             </div>
             
-            <p class="mt-8 text-xs text-gray-400 text-center">សូមស្កេន QR Code ដែលទទួលបានពីគ្រូ ដើម្បីចូលងាយស្រួល។</p>
+            <p class="mt-8 text-xs text-gray-300 text-center flex items-center gap-1 justify-center">
+                <i data-lucide="info" class="w-3.5 h-3.5"></i>
+                <span data-i18n="login_footer">ស្កេន QR Code ពីសាលាដើម្បីចូលដោយស្វ័យប្រវត្តិ។</span>
+            </p>
         </div>
-    </div>
+    </main>
 
 
-    <!-- ================= MAIN CONTENT SECTION ================= -->
-    <div id="main-content" class="hidden opacity-0 transition-opacity duration-500 flex-1 flex flex-col h-full w-full">
+    <div id="main-content" class="hidden opacity-0 transition-opacity duration-500 flex-1 flex flex-col h-full w-full" aria-hidden="true">
         
-        <!-- DASHBOARD VIEW -->
-        <div id="dashboard-view" class="flex flex-col flex-1 w-full pb-20">
-            <!-- Header Profile Area -->
-            <div class="bg-header-green pt-safe pb-6 px-6 rounded-b-[2rem] shadow-md relative z-20">
+        <main id="dashboard-view" class="flex flex-col flex-1 w-full pb-20 focus:outline-none" tabindex="-1">
+            <header class="bg-header-green pt-safe pb-6 px-6 rounded-b-[2rem] shadow-md relative z-20">
                 <div class="flex justify-between items-start mb-6">
                     <div>
                         <h2 id="header-school-name" class="text-white font-bold text-lg">សាលាបឋមសិក្សា</h2>
                         <p id="header-academic-year" class="text-emerald-100/80 text-xs">ឆ្នាំសិក្សា ២០២៥-២០២៦</p>
                     </div>
                     
-                    <!-- Notification Bell -->
-                    <button onclick="toggleNotifications()" class="relative p-2 bg-white/10 rounded-full hover:bg-white/20 transition">
-                        <i data-lucide="bell" class="w-6 h-6 text-white"></i>
-                        <!-- Red dot badge -->
-                        <span id="notif-badge" class="absolute top-1.5 right-1.5 flex h-2.5 w-2.5 hidden">
+                    <button onclick="toggleNotifications()" aria-label="បើកការជូនដំណឹង" aria-haspopup="dialog" class="relative p-2 bg-white/10 rounded-full hover:bg-white/20 transition focus-visible:ring-2 focus-visible:ring-white outline-none">
+                        <i data-lucide="bell" class="w-6 h-6 text-white" aria-hidden="true"></i>
+                        <span id="notif-badge" class="absolute top-1 right-1 flex h-2.5 w-2.5 hidden">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                             <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500 border border-emerald-800"></span>
                         </span>
                     </button>
                 </div>
 
-                <!-- Student Profile Info -->
                 <div class="flex items-center gap-4 bg-white/10 p-3 rounded-2xl border border-white/20 backdrop-blur-sm">
                     <div class="relative">
-                        <div class="w-14 h-14 rounded-full border-2 border-white overflow-hidden bg-gray-300">
-                            <img id="display-photo" src="https://api.dicebear.com/7.x/avataaars/svg?seed=student1&backgroundColor=b6e3f4" alt="Student" class="w-full h-full object-cover">
+                        <div class="w-14 h-14 rounded-full border-2 border-white overflow-hidden bg-gray-300 flex items-center justify-center">
+                            <img id="display-photo" loading="lazy" src="https://api.dicebear.com/7.x/avataaars/svg?seed=student1&backgroundColor=b6e3f4" alt="រូបថតសិស្ស" class="w-full h-full object-cover">
                         </div>
                     </div>
                     <div class="flex-1">
-                        <p class="text-emerald-100 text-[11px] font-semibold mb-0.5">ព័ត៌មានកូនរបស់អ្នក៖</p>
+                        <p class="text-emerald-100 text-[11px] font-semibold mb-0.5" data-i18n="student_info_label">ព័ត៌មានកូនរបស់អ្នក៖</p>
                         <h3 id="display-name" class="text-white font-bold text-base kh-moul">កំពុងទាញយក...</h3>
                         <div class="flex items-center gap-2 mt-1">
                             <span id="display-gender" class="bg-black/20 px-2 py-0.5 rounded text-xs text-white border border-white/10">-</span>
-                            <span class="bg-black/20 px-2 py-0.5 rounded text-xs text-white border border-white/10 font-mono">ID: <span id="display-id">***</span></span>
-                            <button onclick="toggleID()" class="text-emerald-200 hover:text-white p-1">
-                                <i data-lucide="eye" id="eye-icon" class="w-3.5 h-3.5"></i>
+                            <span class="bg-black/20 px-2 py-0.5 rounded text-xs text-white border border-white/10 font-mono flex items-center gap-1">
+                                ID: <span id="display-id" aria-live="polite">***</span>
+                            </span>
+                            <button onclick="toggleID()" aria-label="បង្ហាញអត្តលេខ" class="text-emerald-200 hover:text-white p-1 rounded focus-visible:ring-2 focus-visible:ring-white outline-none">
+                                <i data-lucide="eye" id="eye-icon" class="w-3.5 h-3.5" aria-hidden="true"></i>
                             </button>
                         </div>
                     </div>
                 </div>
-            </div>
+            </header>
 
-            <!-- Main Grid Menu -->
-            <div class="flex-1 px-5 -mt-2 pt-6 pb-6 relative z-10">
-                <h3 class="text-gray-400 text-sm font-semibold mb-4 px-1">មុខងារតាមដាន</h3>
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4" id="tracking-grid">
-                    <!-- Grid items injected by JS -->
-                </div>
+            <section class="flex-1 px-5 -mt-2 pt-6 pb-6 relative z-10" aria-label="ម៉ឺនុយមុខងារ">
+                <h3 class="text-gray-400 text-sm font-semibold mb-4 px-1" id="track-heading" data-i18n="tracking_features">មុខងារតាមដាន</h3>
+                <nav class="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4" id="tracking-grid" aria-labelledby="track-heading">
+                    </nav>
 
-                <h3 class="text-gray-400 text-sm font-semibold mb-4 px-1 mt-8">ព័ត៌មានសិស្ស</h3>
-                <div class="grid grid-cols-2 gap-3 md:gap-4" id="info-grid">
-                    <!-- Grid items injected by JS -->
-                </div>
-            </div>
-        </div>
+                <h3 class="text-gray-400 text-sm font-semibold mb-4 px-1 mt-8" id="info-heading" data-i18n="student_info_heading">ព័ត៌មានសិស្ស</h3>
+                <nav class="grid grid-cols-2 gap-3 md:gap-4" id="info-grid" aria-labelledby="info-heading">
+                    </nav>
+            </section>
+        </main>
 
-        <!-- SETTINGS VIEW (Hidden by default) -->
-        <div id="settings-view" class="hidden flex-col flex-1 w-full pb-20 overflow-y-auto">
-            <div class="bg-header-green pt-safe pb-6 px-6 relative z-20 overflow-hidden">
+        <main id="settings-view" class="hidden flex-col flex-1 w-full pb-20 overflow-y-auto focus:outline-none" tabindex="-1">
+            <header class="bg-header-green pt-safe pb-6 px-6 relative z-20 overflow-hidden">
                 <div class="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center mix-blend-overlay"></div>
-                <h1 class="text-white font-bold text-2xl kh-moul relative z-10 mt-4 mb-2">ការកំណត់</h1>
-            </div>
+                <h1 class="text-white font-bold text-2xl kh-moul relative z-10 mt-4 mb-2" data-i18n="settings_title">ការកំណត់</h1>
+            </header>
 
-            <div class="px-4 py-6 space-y-4 relative z-10">
-                <!-- Preferences -->
+            <section class="px-4 py-6 space-y-4 relative z-10" aria-label="ជម្រើសការកំណត់">
                 <div class="bg-card-dark rounded-2xl p-4 shadow-sm border border-gray-800/50">
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="bg-gray-700/50 p-2 rounded-lg"><i data-lucide="sliders-horizontal" class="w-5 h-5 text-gray-300"></i></div>
-                        <h3 class="font-bold text-gray-200 text-sm">ចំណូលចិត្ត</h3>
+                        <div class="bg-gray-700/50 p-2 rounded-lg" aria-hidden="true"><i data-lucide="sliders-horizontal" class="w-5 h-5 text-gray-300"></i></div>
+                        <h3 class="font-bold text-gray-200 text-sm" data-i18n="preferences">ចំណូលចិត្ត</h3>
                     </div>
-                    <div class="h-px w-full bg-gray-800 mb-4"></div>
-                    <div class="flex justify-between items-center mb-5 cursor-pointer" onclick="toggleDarkMode()">
-                        <div class="flex gap-4 items-center pl-1">
-                            <i data-lucide="moon" id="dark-mode-icon" class="w-5 h-5 text-gray-400"></i>
-                            <div>
-                                <p class="font-bold text-[13px] text-gray-200">រូបរាង</p>
-                                <p class="text-[11px] text-gray-400 mt-0.5" id="dark-mode-text">កំពុងប្រើ Dark Mode</p>
+                    <div class="h-px w-full bg-gray-800 mb-4" role="separator"></div>
+                    
+                    <button type="button" role="switch" aria-checked="true" id="btn-dark-mode" onclick="toggleDarkMode()" class="w-full flex justify-between items-center mb-5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg p-1 transition-colors hover:bg-gray-700/30">
+                        <div class="flex gap-4 items-center">
+                            <i data-lucide="moon" id="dark-mode-icon" class="w-5 h-5 text-gray-400 transition-colors group-hover:text-emerald-400" aria-hidden="true"></i>
+                            <div class="text-left">
+                                <p class="font-bold text-[13px] text-gray-200" data-i18n="theme">រូបរាង (Theme)</p>
+                                <p class="text-[11px] text-gray-400 mt-0.5" id="dark-mode-text" data-i18n="dark_mode_active">កំពុងប្រើ Dark Mode</p>
                             </div>
                         </div>
                         <div id="dark-mode-toggle" class="w-10 h-6 bg-emerald-500 rounded-full relative mr-1 transition-colors duration-300">
                             <div id="dark-mode-circle" class="w-5 h-5 bg-white rounded-full absolute right-0.5 top-0.5 shadow-sm transition-transform duration-300"></div>
                         </div>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <div class="flex gap-4 items-center pl-1">
-                            <i data-lucide="languages" class="w-5 h-5 text-gray-400"></i>
-                            <div>
-                                <p class="font-bold text-[13px] text-gray-200">ភាសា</p>
-                                <p class="text-[11px] text-gray-400 mt-0.5">ខ្មែរ</p>
+                    </button>
+                    
+                    <button type="button" onclick="toggleLanguage()" class="w-full flex justify-between items-center group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg p-1 transition-colors hover:bg-gray-700/30">
+                        <div class="flex gap-4 items-center">
+                            <i data-lucide="languages" class="w-5 h-5 text-gray-400 transition-colors group-hover:text-emerald-400" aria-hidden="true"></i>
+                            <div class="text-left">
+                                <p class="font-bold text-[13px] text-gray-200" data-i18n="language_label">ភាសា</p>
+                                <p class="text-[11px] text-gray-400 mt-0.5" id="lang-text" data-i18n="lang_name">ខ្មែរ</p>
                             </div>
                         </div>
-                        <div class="mr-1 text-lg">🇰🇭</div>
-                    </div>
+                        <div class="mr-1 text-lg" id="lang-flag" aria-hidden="true">🇰🇭</div>
+                    </button>
                 </div>
 
-                <!-- Account Security -->
                 <div class="bg-card-dark rounded-2xl p-4 shadow-sm border border-gray-800/50">
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="bg-gray-700/50 p-2 rounded-lg"><i data-lucide="shield" class="w-5 h-5 text-gray-300"></i></div>
-                        <h3 class="font-bold text-gray-200 text-sm">សុវត្ថិភាពគណនី</h3>
+                        <div class="bg-gray-700/50 p-2 rounded-lg" aria-hidden="true"><i data-lucide="shield" class="w-5 h-5 text-gray-300"></i></div>
+                        <h3 class="font-bold text-gray-200 text-sm" data-i18n="account_info">ព័ត៌មានគណនី</h3>
                     </div>
-                    <div class="h-px w-full bg-gray-800 mb-4"></div>
-                    <div class="flex justify-between items-center mb-5">
-                        <div class="flex gap-4 items-center pl-1">
-                            <i data-lucide="key" class="w-5 h-5 text-gray-400"></i>
+                    <div class="h-px w-full bg-gray-800 mb-4" role="separator"></div>
+                    <div class="flex justify-between items-center mb-5 px-1">
+                        <div class="flex gap-4 items-center">
+                            <i data-lucide="key" class="w-5 h-5 text-gray-400" aria-hidden="true"></i>
                             <div>
-                                <p class="font-bold text-[13px] text-gray-200">លេខកូដថ្នាក់រៀន</p>
+                                <p class="font-bold text-[13px] text-gray-200" data-i18n="class_code_label">លេខកូដថ្នាក់រៀន</p>
                                 <p class="text-[11px] text-gray-400 mt-0.5 font-mono" id="setting-tid">***</p>
                             </div>
                         </div>
                     </div>
-                    <div class="flex justify-between items-center">
-                        <div class="flex gap-4 items-center pl-1">
-                            <i data-lucide="user" class="w-5 h-5 text-gray-400"></i>
+                    <div class="flex justify-between items-center px-1">
+                        <div class="flex gap-4 items-center">
+                            <i data-lucide="user" class="w-5 h-5 text-gray-400" aria-hidden="true"></i>
                             <div>
-                                <p class="font-bold text-[13px] text-gray-200">អត្តលេខសិស្ស</p>
+                                <p class="font-bold text-[13px] text-gray-200" data-i18n="student_id_label">អត្តលេខសិស្ស</p>
                                 <p class="text-[11px] text-gray-400 mt-0.5 font-mono" id="setting-sid">***</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Account Management -->
-                <div class="bg-card-dark rounded-2xl p-4 shadow-sm border border-gray-800/50 cursor-pointer" onclick="logout()">
+                <button type="button" onclick="logout()" class="w-full bg-card-dark rounded-2xl p-4 shadow-sm border border-gray-800/50 hover:bg-red-500/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 text-left group">
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="bg-gray-700/50 p-2 rounded-lg"><i data-lucide="user-cog" class="w-5 h-5 text-gray-300"></i></div>
-                        <h3 class="font-bold text-gray-200 text-sm">ការគ្រប់គ្រងគណនី</h3>
+                        <div class="bg-red-500/10 p-2 rounded-lg transition-colors group-hover:bg-red-500/20" aria-hidden="true"><i data-lucide="log-out" class="w-5 h-5 text-red-500"></i></div>
+                        <h3 class="font-bold text-red-400 text-sm" data-i18n="logout_btn">ចាកចេញ</h3>
                     </div>
-                    <div class="h-px w-full bg-gray-800 mb-4"></div>
-                    <div class="flex justify-between items-center">
-                        <div class="flex gap-4 items-center pl-1">
-                            <i data-lucide="power" class="w-5 h-5 text-red-500"></i>
-                            <div>
-                                <p class="font-bold text-[13px] text-gray-200">ចាកចេញ</p>
-                                <p class="text-[11px] text-gray-400 mt-0.5">ចាកចេញពីគណនីដោយសុវត្ថិភាព</p>
-                            </div>
-                        </div>
-                        <i data-lucide="chevron-right" class="w-5 h-5 text-gray-500"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
+                    <div class="h-px w-full bg-gray-800 mb-4" role="separator"></div>
+                    <p class="text-[13px] text-gray-400 px-1" data-i18n="logout_desc">ចាកចេញពីគណនីដោយសុវត្ថិភាព។ អ្នកនឹងត្រូវបញ្ចូលលេខកូដម្តងទៀតនៅពេលក្រោយ។</p>
+                </button>
+            </section>
+        </main>
 
-        <!-- Bottom Navigation Bar -->
-        <div class="fixed bottom-0 left-0 w-full bg-[#1c1c1e]/95 backdrop-blur-lg border-t border-gray-800 pb-safe pt-2 px-6 z-40">
-            <div class="flex justify-around items-center max-w-sm mx-auto pb-2">
-                <button onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="flex flex-col items-center gap-1 text-emerald-500 w-16 transition-colors">
-                    <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
-                    <span class="text-[10px] font-bold">Dashboard</span>
+        <nav class="fixed bottom-0 left-0 w-full bg-[#1c1c1e]/95 backdrop-blur-lg border-t border-gray-800 pb-safe pt-2 px-6 z-40" aria-label="ម៉ឺនុយខាងក្រោម">
+            <div class="flex justify-around items-center max-w-sm mx-auto pb-2" role="tablist">
+                <button role="tab" aria-selected="true" onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="flex flex-col items-center gap-1 text-emerald-500 w-16 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg py-1">
+                    <i data-lucide="layout-dashboard" class="w-6 h-6" aria-hidden="true"></i>
+                    <span class="text-[10px] font-bold" data-i18n="nav_home">ទំព័រដើម</span>
                 </button>
-                <button onclick="switchTab('settings')" id="tab-btn-settings" class="flex flex-col items-center gap-1 text-gray-500 hover:text-gray-300 w-16 transition-colors">
-                    <i data-lucide="settings" class="w-6 h-6"></i>
-                    <span class="text-[10px] font-bold">Setting</span>
+                <button role="tab" aria-selected="false" onclick="switchTab('settings')" id="tab-btn-settings" class="flex flex-col items-center gap-1 text-gray-500 hover:text-gray-300 w-16 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg py-1">
+                    <i data-lucide="settings" class="w-6 h-6" aria-hidden="true"></i>
+                    <span class="text-[10px] font-bold" data-i18n="nav_settings">ការកំណត់</span>
                 </button>
             </div>
-        </div>
+        </nav>
     </div>
 
-    <!-- NOTIFICATION MODAL (IMPROVED) -->
-    <div id="notification-modal" class="fixed inset-0 z-[70] hidden flex-col justify-end sm:justify-center items-center px-0 sm:px-4 pb-0 sm:pb-4 transition-opacity duration-300 opacity-0">
-        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="toggleNotifications()"></div>
+    <div id="notification-modal" role="dialog" aria-modal="true" aria-labelledby="notif-title" class="fixed inset-0 z-[70] hidden flex-col justify-end sm:justify-center items-center px-0 sm:px-4 pb-0 sm:pb-4 transition-opacity duration-300 opacity-0" aria-hidden="true">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="toggleNotifications()" aria-hidden="true"></div>
         <div class="bg-card-dark w-full sm:max-w-md rounded-t-[2rem] sm:rounded-[2rem] border border-gray-700 relative z-10 shadow-2xl flex flex-col max-h-[85vh] transform transition-transform duration-300 translate-y-full sm:translate-y-0" id="notification-content">
-            <div class="p-6 border-b border-gray-700/50 flex justify-between items-center bg-gray-800/30 rounded-t-[2rem] sm:rounded-t-[2rem]">
+            <header class="p-5 border-b border-gray-700/50 flex justify-between items-center bg-gray-800/30 rounded-t-[2rem] sm:rounded-t-[2rem]">
                 <div class="flex items-center gap-3">
-                    <div class="bg-emerald-500/20 p-2.5 rounded-xl text-emerald-400 relative">
+                    <div class="bg-emerald-500/20 p-2.5 rounded-xl text-emerald-400" aria-hidden="true">
                         <i data-lucide="bell-ring" class="w-6 h-6"></i>
-                        <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 border-2 border-[#1c1c1e] rounded-full"></span>
                     </div>
                     <div>
-                        <h3 class="text-white font-bold text-lg kh-moul leading-tight">ការជូនដំណឹង</h3>
-                        <p class="text-xs text-gray-400 mt-0.5">សារពីសាលារៀន</p>
+                        <h3 id="notif-title" class="text-white font-bold text-lg kh-moul leading-tight" data-i18n="notif_title">ការជូនដំណឹង</h3>
+                        <p class="text-xs text-gray-400 mt-0.5" data-i18n="notif_subtitle">សារពីសាលារៀន</p>
                     </div>
                 </div>
-                <button onclick="toggleNotifications()" class="text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 p-2 rounded-full transition">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-            <div id="notification-list" class="flex-1 overflow-y-auto p-5 space-y-3 custom-scrollbar">
-                <!-- Fetching state -->
+                <div class="flex items-center gap-2">
+                    <button id="btn-dismiss-all" onclick="dismissAllNotifications()" class="hidden text-xs text-red-400 hover:text-red-300 bg-red-500/10 px-3 py-1.5 rounded-lg transition font-medium focus-visible:ring-2 focus-visible:ring-red-400 outline-none" data-i18n="notif_dismiss_all">លុបទាំងអស់</button>
+                    <button onclick="toggleNotifications()" aria-label="បិទការជូនដំណឹង" class="text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 p-2 rounded-full transition focus-visible:ring-2 focus-visible:ring-white outline-none">
+                        <i data-lucide="x" class="w-5 h-5" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </header>
+            <div id="notification-list" class="flex-1 overflow-y-auto p-5 space-y-3 custom-scrollbar" aria-live="polite">
                 <div class="text-center py-10">
                     <div class="spinner w-8 h-8 mx-auto border-t-emerald-500 mb-4"></div>
-                    <p class="text-gray-400 text-sm">កំពុងទាញយក...</p>
+                    <p class="text-gray-400 text-sm" data-i18n="loading">កំពុងទាញយក...</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- QR Scanner Modal -->
-    <div id="qr-scanner-modal" class="fixed inset-0 z-[70] hidden flex-col items-center justify-center px-4">
-        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeQRScanner()"></div>
+    <div id="qr-scanner-modal" role="dialog" aria-modal="true" aria-labelledby="qr-title" class="fixed inset-0 z-[70] hidden flex-col items-center justify-center px-4" aria-hidden="true">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeQRScanner()" aria-hidden="true"></div>
         <div class="bg-card-dark w-full max-w-sm rounded-[2rem] border border-gray-700 relative z-10 shadow-2xl p-6 transform scale-95 opacity-0 transition-all duration-300" id="qr-scanner-content">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-white font-bold text-xl">ស្កេន QR Code</h3>
-                <button onclick="closeQRScanner()" class="text-gray-400 hover:text-white bg-gray-800 p-1.5 rounded-full transition">
-                    <i data-lucide="x" class="w-5 h-5"></i>
+            <header class="flex justify-between items-center mb-4">
+                <h3 id="qr-title" class="text-white font-bold text-xl" data-i18n="qr_title">ស្កេន QR Code</h3>
+                <button onclick="closeQRScanner()" aria-label="បិទកាមេរ៉ា" class="text-gray-400 hover:text-white bg-gray-800 p-1.5 rounded-full transition focus-visible:ring-2 focus-visible:ring-white outline-none">
+                    <i data-lucide="x" class="w-5 h-5" aria-hidden="true"></i>
                 </button>
-            </div>
-            <p class="text-gray-400 text-[13px] mb-4 text-center">សូមដាក់កាមេរ៉ារបស់អ្នកឱ្យចំ QR Code ដើម្បីចូលប្រព័ន្ធ។</p>
+            </header>
+            <p class="text-gray-400 text-[13px] mb-4 text-center" data-i18n="qr_desc">សូមដាក់កាមេរ៉ារបស់អ្នកឱ្យចំ QR Code របស់គ្រូ។</p>
             
-            <!-- Camera Preview Container -->
             <div class="w-full bg-black rounded-2xl overflow-hidden border-2 border-emerald-500/50 relative flex items-center justify-center min-h-[250px]">
                 <div id="qr-reader" class="w-full"></div>
             </div>
             
-            <p id="qr-status" class="text-emerald-500 text-xs text-center mt-4 animate-pulse">កំពុងបើកកាមេរ៉ា...</p>
+            <p id="qr-status" aria-live="polite" class="text-emerald-500 text-xs text-center mt-4 animate-pulse" data-i18n="qr_opening">កំពុងបើកកាមេរ៉ា...</p>
         </div>
     </div>
 
-    <!-- Firebase SDKs & Script -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBU50HJrekgHWwwyLq5CTRwhjHkGJAAAfs",
-            authDomain: "classroom-management-82382.firebaseapp.com",
-            projectId: "classroom-management-82382",
-            storageBucket: "classroom-management-82382.firebasestorage.app",
-            messagingSenderId: "146641865620",
-            appId: "1:146641865620:web:ce693b7b064afd5d1bdd81",
-            measurementId: "G-PX867PB723"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const PTEC_APP_ID = "ptec-app";
-
-        // Global variables
-        let loggedInStudent = null;
-        let isIdVisible = false;
-        let realId = "";
-        let unsubNotifications = null;
-        let currentNotifs = [];
-
-        // UI Elements
-        const loadingOverlay = document.getElementById('loading-overlay');
-        const authSection = document.getElementById('auth-section');
-        const mainContent = document.getElementById('main-content');
-        const loginForm = document.getElementById('login-form');
-        const loginError = document.getElementById('login-error');
-        const teacherCodeInput = document.getElementById('teacher-code');
-        const studentCodeInput = document.getElementById('student-code');
-        const btnLogin = document.getElementById('btn-login');
-
-        // Render Grids
-        const trackingFeatures = [
-            { name: 'តាមដានវត្តមាន', icon: 'calendar-check', url: 'attendance-tracking.html', color: 'text-orange-400', bgColor: 'bg-orange-400/10' },
-            { name: 'តាមដានពិន្ទុ', icon: 'bar-chart-3', url: 'grade-tracking.html', color: 'text-blue-400', bgColor: 'bg-blue-400/10' },
-            { name: 'តាមដានកិច្ចការផ្ទះ', icon: 'book-open-check', url: 'homework-tracking.html', color: 'text-purple-400', bgColor: 'bg-purple-400/10' },
-            { name: 'តាមដានសុខភាព', icon: 'heart-pulse', url: 'health-tracking.html', color: 'text-rose-400', bgColor: 'bg-rose-400/10' },
-            { name: 'សៀវភៅតាមដាន', icon: 'book-user', url: 'library-tracking.html', color: 'text-emerald-400', bgColor: 'bg-emerald-400/10' },
-            { name: 'កាតសិស្ស', icon: 'contact-2', url: 'student-card.html', color: 'text-amber-400', bgColor: 'bg-amber-400/10' }
-        ];
-
-        const infoFeatures = [
-            { name: 'ប្រវត្តិរូប', icon: 'user',url:'profile.html',color: 'text-indigo-400', bgColor: 'bg-indigo-400/10' },
-            { name: 'គ្រួសារ', icon: 'users', url: 'family.html', color: 'text-pink-400', bgColor: 'bg-pink-400/10' }
-        ];
-
-        const trackingGrid = document.getElementById('tracking-grid');
-        trackingFeatures.forEach(feature => {
-            const card = document.createElement('button');
-            card.className = 'feature-card bg-card-dark p-4 rounded-2xl flex flex-col items-center justify-center text-center border border-gray-700/50 shadow-sm gap-3';
-            card.onclick = () => { if(feature.url) window.location.href = feature.url; else alert(`មុខងារ ${feature.name} មិនទាន់ដំណើរការនៅឡើយទេ!`); };
-            card.innerHTML = `<div class="${feature.bgColor} p-3.5 rounded-2xl w-14 h-14 flex items-center justify-center"><i data-lucide="${feature.icon}" class="w-7 h-7 ${feature.color}"></i></div><h3 class="text-gray-200 text-xs font-semibold leading-tight">${feature.name}</h3>`;
-            trackingGrid.appendChild(card);
-        });
-
-        const infoGrid = document.getElementById('info-grid');
-        infoFeatures.forEach(feature => {
-            const card = document.createElement('button');
-            card.className = 'feature-card bg-card-dark p-4 rounded-2xl flex flex-col items-center justify-center text-center border border-gray-700/50 shadow-sm gap-3';
-            card.onclick = () => { if(feature.url) window.location.href = feature.url; else alert(`មុខងារ ${feature.name} មិនទាន់ដំណើរការនៅឡើយទេ!`); };
-            card.innerHTML = `<div class="${feature.bgColor} p-3.5 rounded-2xl w-14 h-14 flex items-center justify-center"><i data-lucide="${feature.icon}" class="w-7 h-7 ${feature.color}"></i></div><h3 class="text-gray-200 text-xs font-semibold leading-tight">${feature.name}</h3>`;
-            infoGrid.appendChild(card);
-        });
-
-        lucide.createIcons();
-
-        // --- Dark Mode Logic ---
-        let isDarkMode = localStorage.getItem('theme') !== 'light';
-
-        function updateDarkModeUI() {
-            const toggle = document.getElementById('dark-mode-toggle');
-            const circle = document.getElementById('dark-mode-circle');
-            const text = document.getElementById('dark-mode-text');
-            const icon = document.getElementById('dark-mode-icon');
-            
-            if (isDarkMode) {
-                toggle.classList.remove('bg-gray-400');
-                toggle.classList.add('bg-emerald-500');
-                circle.classList.remove('-translate-x-4');
-                if(text) text.textContent = 'កំពុងប្រើ Dark Mode';
-                if(icon) icon.setAttribute('data-lucide', 'moon');
-            } else {
-                toggle.classList.remove('bg-emerald-500');
-                toggle.classList.add('bg-gray-400');
-                circle.classList.add('-translate-x-4');
-                if(text) text.textContent = 'កំពុងប្រើ Light Mode';
-                if(icon) icon.setAttribute('data-lucide', 'sun');
-            }
-            lucide.createIcons();
-        }
-
-        window.toggleDarkMode = function() {
-            isDarkMode = !isDarkMode;
-            if (isDarkMode) {
-                document.body.classList.remove('light-mode');
-                localStorage.setItem('theme', 'dark');
-            } else {
-                document.body.classList.add('light-mode');
-                localStorage.setItem('theme', 'light');
-            }
-            updateDarkModeUI();
-        };
-
-        if (!isDarkMode) document.body.classList.add('light-mode');
-        updateDarkModeUI();
-
-
-        // Check Auth Status
-        const urlParams = new URLSearchParams(window.location.search);
-        const urlTeacherId = urlParams.get('tid');
-        const urlStudentId = urlParams.get('sid');
-
-        const initAuth = async () => {
-            try {
-                if (!auth.currentUser) await signInAnonymously(auth);
-            } catch (error) {
-                console.error("Auth error:", error);
-                showLogin();
-            }
-        };
-
-        initAuth().then(() => {
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    if (urlTeacherId && urlStudentId) {
-                        attemptLogin(urlTeacherId, urlStudentId);
-                    } 
-                    else if (localStorage.getItem('savedTid') && localStorage.getItem('savedSid')) {
-                        attemptLogin(localStorage.getItem('savedTid'), localStorage.getItem('savedSid'));
-                    }
-                    else {
-                        showLogin();
-                    }
-                }
-            });
-        });
-
-        async function attemptLogin(tid, sid) {
-            loginError.classList.add('hidden');
-            const originalBtnHtml = btnLogin.innerHTML;
-            btnLogin.innerHTML = `<span class="spinner w-5 h-5 border-t-white"></span> កំពុងចូល...`;
-            btnLogin.disabled = true;
-
-            try {
-                const studentRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'students', sid);
-                const studentSnap = await getDoc(studentRef);
-
-                if (studentSnap.exists()) {
-                    loggedInStudent = studentSnap.data();
-                    loggedInStudent.id = studentSnap.id;
-                    realId = loggedInStudent.id;
-                    
-                    localStorage.setItem('savedTid', tid);
-                    localStorage.setItem('savedSid', sid);
-
-                    try {
-                        const profileRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'profile', 'data');
-                        const profileSnap = await getDoc(profileRef);
-                        
-                        if (profileSnap.exists()) {
-                            const pData = profileSnap.data();
-                            if (pData.school_name_admin) {
-                                document.getElementById('header-school-name').textContent = pData.school_name_admin;
-                            }
-                            if (pData.academic_year) {
-                                document.getElementById('header-academic-year').textContent = "ឆ្នាំសិក្សា " + pData.academic_year;
-                            }
-                        }
-                    } catch (profErr) {
-                        console.error("Failed to fetch teacher's profile for school name:", profErr);
-                    }
-
-                    updateDashboardUI(loggedInStudent, tid, sid);
-                    listenToNotifications(tid, sid);
-                    hideLoginShowDashboard();
-                } else {
-                    console.warn("Student not found");
-                    loginError.classList.remove('hidden');
-                    loginError.textContent = "រកមិនឃើញសិស្សនេះទេ។ លេខកូដថ្នាក់ ឬអត្តលេខអាចខុស។";
-                    showLogin();
-                }
-            } catch (error) {
-                console.error("Error fetching data:", error);
-                loginError.classList.remove('hidden');
-                loginError.textContent = "មានបញ្ហាភ្ជាប់ទៅកាន់ Database។ សូមសាកល្បងម្តងទៀត។";
-                showLogin();
-            } finally {
-                btnLogin.innerHTML = originalBtnHtml;
-                btnLogin.disabled = false;
-                lucide.createIcons();
-            }
-        }
-
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const tCode = teacherCodeInput.value.trim();
-            const sCode = studentCodeInput.value.trim();
-            if(tCode && sCode) attemptLogin(tCode, sCode);
-        });
-
-        // --- IMPROVED NOTIFICATIONS LOGIC ---
-        function listenToNotifications(tid, sid) {
-            const notifRef = collection(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'notifications');
-            
-            if (unsubNotifications) unsubNotifications();
-
-            unsubNotifications = onSnapshot(notifRef, (snap) => {
-                currentNotifs = [];
-                snap.forEach(doc => {
-                    const data = doc.data();
-                    if (data.target === 'all' || data.target === sid) {
-                        currentNotifs.push({ id: doc.id, ...data });
-                    }
-                });
-
-                currentNotifs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                renderNotifications();
-            }, (error) => {
-                console.error("Error fetching notifications:", error);
-                document.getElementById('notification-list').innerHTML = `<div class="text-center py-10 text-red-400 text-sm">មានបញ្ហាក្នុងការទាញយកទិន្នន័យ</div>`;
-            });
-        }
-
-        function renderNotifications() {
-            const listEl = document.getElementById('notification-list');
-            const badge = document.getElementById('notif-badge');
-
-            let dismissedNotifs = JSON.parse(localStorage.getItem('dismissedNotifs_' + realId) || '[]');
-            let visibleNotifs = currentNotifs.filter(n => !dismissedNotifs.includes(n.id));
-
-            if (visibleNotifs.length === 0) {
-                listEl.innerHTML = `<div class="text-center py-12 text-gray-500"><i data-lucide="bell-off" class="w-12 h-12 mx-auto mb-3 opacity-20"></i><p class="text-sm">មិនមានការជូនដំណឹងថ្មីទេ</p></div>`;
-                if (badge) badge.classList.add('hidden');
-                lucide.createIcons();
-                return;
-            }
-
-            if (badge) badge.classList.remove('hidden');
-
-            let html = '';
-            visibleNotifs.forEach((n, index) => {
-                let icon = 'info', colorClass = 'text-blue-400 bg-blue-500/10 border-blue-500/20';
-                let cardBorder = 'border-gray-700/50';
-
-                // Handle new notification types
-                if (n.type === 'alert') { 
-                    icon = 'alert-triangle'; 
-                    colorClass = 'text-red-400 bg-red-500/10 border-red-500/20'; 
-                    cardBorder = 'border-red-900/30';
-                }
-                if (n.type === 'success') { 
-                    icon = 'check-circle'; 
-                    colorClass = 'text-green-400 bg-green-500/10 border-green-500/20'; 
-                }
-                if (n.type === 'congrats') { 
-                    icon = 'award'; 
-                    colorClass = 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20';
-                    cardBorder = 'border-yellow-900/30';
-                }
-
-                const d = new Date(n.createdAt);
-                const dateStr = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-                
-                // Add staggered animation delay
-                const delay = index * 0.1;
-
-                html += `
-                    <div id="notif-${n.id}" class="notif-card-enter bg-gray-800/40 p-4 rounded-2xl border ${cardBorder} hover:bg-gray-800/60 transition relative group shadow-sm" style="animation-delay: ${delay}s">
-                        <button onclick="dismissNotification('${n.id}')" class="absolute top-3 right-3 p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-full transition opacity-100 sm:opacity-0 sm:group-hover:opacity-100" title="លុបការជូនដំណឹងនេះ">
-                            <i data-lucide="x" class="w-4 h-4"></i>
-                        </button>
-                        <div class="flex gap-4 pr-6">
-                            <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${colorClass} shadow-inner">
-                                <i data-lucide="${icon}" class="w-5 h-5"></i>
-                            </div>
-                            <div class="flex-1">
-                                <h4 class="font-bold text-gray-200 text-sm mb-1">${n.title}</h4>
-                                <p class="text-[13px] text-gray-400 leading-relaxed mb-2">${n.message}</p>
-                                <span class="text-[10px] text-gray-500 font-mono"><i data-lucide="clock" class="w-3 h-3 inline mr-1"></i>${dateStr}</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            listEl.innerHTML = html;
-            lucide.createIcons();
-        }
-
-        window.dismissNotification = function(notifId) {
-            let dismissedNotifs = JSON.parse(localStorage.getItem('dismissedNotifs_' + realId) || '[]');
-            if (!dismissedNotifs.includes(notifId)) {
-                dismissedNotifs.push(notifId);
-                localStorage.setItem('dismissedNotifs_' + realId, JSON.stringify(dismissedNotifs));
-            }
-            renderNotifications();
-        }
-
-        window.toggleNotifications = function() {
-            const notifModal = document.getElementById('notification-modal');
-            const notifContent = document.getElementById('notification-content');
-            
-            if(notifModal.classList.contains('hidden')) {
-                notifModal.classList.remove('hidden');
-                notifModal.classList.add('flex');
-                
-                setTimeout(() => {
-                    notifModal.classList.remove('opacity-0');
-                    notifContent.classList.remove('translate-y-full');
-                }, 10);
-            } else {
-                notifModal.classList.add('opacity-0');
-                notifContent.classList.add('translate-y-full');
-                
-                setTimeout(() => {
-                    notifModal.classList.add('hidden');
-                    notifModal.classList.remove('flex');
-                }, 300);
-            }
-        }
-
-        // --- DASHBOARD UI ---
-        function updateDashboardUI(student, tid, sid) {
-            document.getElementById('display-name').textContent = student.name || 'មិនស្គាល់ឈ្មោះ';
-            document.getElementById('display-gender').textContent = student.gender || '-';
-            
-            const photoEl = document.getElementById('display-photo');
-            if (student.photo) {
-                photoEl.src = student.photo;
-            } else {
-                photoEl.src = `https://api.dicebear.com/7.x/notionists/svg?seed=${student.id}`;
-            }
-
-            isIdVisible = false;
-            document.getElementById('display-id').textContent = "***";
-            document.getElementById('eye-icon').setAttribute('data-lucide', 'eye');
-            
-            if (document.getElementById('setting-tid')) document.getElementById('setting-tid').textContent = tid || '***';
-            if (document.getElementById('setting-sid')) document.getElementById('setting-sid').textContent = sid || '***';
-
-            lucide.createIcons();
-        }
-
-        function showLogin() {
-            loadingOverlay.classList.add('opacity-0');
-            setTimeout(() => {
-                loadingOverlay.classList.add('hidden');
-                authSection.classList.remove('hidden');
-                setTimeout(() => authSection.classList.remove('opacity-0'), 50);
-            }, 300);
-        }
-
-        function hideLoginShowDashboard() {
-            loadingOverlay.classList.add('opacity-0');
-            authSection.classList.add('opacity-0');
-            
-            setTimeout(() => {
-                loadingOverlay.classList.add('hidden');
-                authSection.classList.add('hidden');
-                
-                mainContent.classList.remove('hidden');
-                switchTab('dashboard'); 
-                setTimeout(() => mainContent.classList.remove('opacity-0'), 50);
-            }, 300);
-        }
-
-        window.switchTab = function(tabName) {
-            const dashboardView = document.getElementById('dashboard-view');
-            const settingsView = document.getElementById('settings-view');
-            const btnDashboard = document.getElementById('tab-btn-dashboard');
-            const btnSettings = document.getElementById('tab-btn-settings');
-
-            if (tabName === 'dashboard') {
-                dashboardView.classList.remove('hidden'); dashboardView.classList.add('flex');
-                settingsView.classList.add('hidden'); settingsView.classList.remove('flex');
-
-                btnDashboard.classList.add('text-emerald-500'); btnDashboard.classList.remove('text-gray-500');
-                btnSettings.classList.remove('text-emerald-500'); btnSettings.classList.add('text-gray-500');
-            } else if (tabName === 'settings') {
-                settingsView.classList.remove('hidden'); settingsView.classList.add('flex');
-                dashboardView.classList.add('hidden'); dashboardView.classList.remove('flex');
-
-                btnSettings.classList.add('text-emerald-500'); btnSettings.classList.remove('text-gray-500');
-                btnDashboard.classList.remove('text-emerald-500'); btnDashboard.classList.add('text-gray-500');
-            }
-        };
-
-        window.logout = function() {
-            if(confirm('តើអ្នកពិតជាចង់ចាកចេញពីគណនីមែនទេ?')) {
-                localStorage.removeItem('savedTid');
-                localStorage.removeItem('savedSid');
-                
-                if (unsubNotifications) {
-                    unsubNotifications();
-                    unsubNotifications = null;
-                }
-
-                window.history.replaceState({}, document.title, window.location.pathname);
-                
-                teacherCodeInput.value = '';
-                studentCodeInput.value = '';
-                
-                if (document.getElementById('setting-tid')) document.getElementById('setting-tid').textContent = '***';
-                if (document.getElementById('setting-sid')) document.getElementById('setting-sid').textContent = '***';
-                
-                document.getElementById('header-school-name').textContent = 'សាលាបឋមសិក្សា';
-                document.getElementById('header-academic-year').textContent = 'ឆ្នាំសិក្សា ២០២៥-២០២៦';
-                
-                switchTab('dashboard');
-
-                mainContent.classList.add('opacity-0');
-                setTimeout(() => {
-                    mainContent.classList.add('hidden');
-                    authSection.classList.remove('hidden');
-                    setTimeout(() => authSection.classList.remove('opacity-0'), 50);
-                }, 500);
-            }
-        }
-
-        window.toggleID = function() {
-            if(!realId) return;
-            isIdVisible = !isIdVisible;
-            document.getElementById('display-id').textContent = isIdVisible ? realId : "***";
-            const eyeIcon = document.getElementById('eye-icon');
-            if(isIdVisible) eyeIcon.setAttribute('data-lucide', 'eye-off');
-            else eyeIcon.setAttribute('data-lucide', 'eye');
-            lucide.createIcons();
-        }
-
-        let html5QrCode;
-
-        window.scanQR = function() {
-            const modal = document.getElementById('qr-scanner-modal');
-            const content = document.getElementById('qr-scanner-content');
-            const statusText = document.getElementById('qr-status');
-            
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            statusText.textContent = "កំពុងបើកកាមេរ៉ា...";
-            statusText.className = "text-emerald-500 text-xs text-center mt-4 animate-pulse";
-            
-            setTimeout(() => {
-                content.classList.remove('scale-95', 'opacity-0');
-                content.classList.add('scale-100', 'opacity-100');
-            }, 10);
-
-            if (!html5QrCode) html5QrCode = new Html5Qrcode("qr-reader");
-
-            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-            
-            html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
-                .then(() => { statusText.textContent = "កំពុងស្កេន..."; })
-                .catch((err) => {
-                    console.error("Camera start failed:", err);
-                    statusText.textContent = "មិនអាចបើកកាមេរ៉ាបានទេ! សូមពិនិត្យមើលសិទ្ធិអនុញ្ញាតកាមេរ៉ា (Camera Permissions) នៅលើ Browser របស់អ្នក។";
-                    statusText.className = "text-red-500 text-xs text-center mt-4";
-                });
-        }
-
-        function onScanSuccess(decodedText, decodedResult) {
-            try {
-                const url = new URL(decodedText);
-                const tid = url.searchParams.get('tid');
-                const sid = url.searchParams.get('sid');
-                
-                if (tid && sid) {
-                    const statusText = document.getElementById('qr-status');
-                    statusText.textContent = "ស្កេនបានជោគជ័យ! កំពុងចូល...";
-                    statusText.className = "text-emerald-500 text-xs text-center mt-4 font-bold";
-                    
-                    document.getElementById('teacher-code').value = tid;
-                    document.getElementById('student-code').value = sid;
-
-                    closeQRScanner().then(() => attemptLogin(tid, sid));
-                } else {
-                    throw new Error("Invalid format");
-                }
-            } catch (e) {
-                const statusText = document.getElementById('qr-status');
-                statusText.textContent = "QR Code មិនត្រឹមត្រូវ! សូមស្កេន QR របស់ Parent Portal វិញ។";
-                statusText.className = "text-red-500 text-xs text-center mt-4 animate-bounce";
-            }
-        }
-
-        window.closeQRScanner = function() {
-            return new Promise((resolve) => {
-                const modal = document.getElementById('qr-scanner-modal');
-                const content = document.getElementById('qr-scanner-content');
-                
-                content.classList.remove('scale-100', 'opacity-100');
-                content.classList.add('scale-95', 'opacity-0');
-                
-                const stopScanner = () => {
-                    if (html5QrCode && html5QrCode.getState() === 2) {
-                        html5QrCode.stop().then(() => {
-                            html5QrCode.clear();
-                            finishClose();
-                        }).catch(finishClose);
-                    } else finishClose();
-                };
-
-                const finishClose = () => {
-                    setTimeout(() => {
-                        modal.classList.add('hidden');
-                        modal.classList.remove('flex');
-                        resolve();
-                    }, 300);
-                };
-
-                stopScanner();
-            });
-        }
-    </script>
-    <script src="pwa-install.js"></script>
+    <script src="style_index/app.js"></script>
+    <script type="module" src="style_index/auth.js"></script>
 </body>
 </html>
