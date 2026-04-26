@@ -65,7 +65,7 @@
     <!-- Header -->
     <div class="bg-header-green pt-12 pb-6 px-6 rounded-b-[2rem] shadow-md relative z-20 shrink-0">
         <div class="flex justify-between items-center mb-6">
-            <button onclick="window.location.href='index.html'" class="p-2 bg-white/10 rounded-full hover:bg-white/20 transition flex items-center justify-center">
+            <button onclick="window.location.href='index.html'" class="p-2 bg-white/10 rounded-full hover:bg-white/20 transition flex items-center justify-center outline-none">
                 <i data-lucide="arrow-left" class="w-5 h-5 text-white"></i>
             </button>
             <h1 class="text-white font-bold text-lg kh-moul">តាមដានវត្តមាន</h1>
@@ -137,31 +137,16 @@
 
     </div>
 
-    <!-- Firebase Scripts -->
+    <!-- Firebase Scripts (ភ្ជាប់ជាមួយឯកសាររួម firebase-config.js) -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBU50HJrekgHWwwyLq5CTRwhjHkGJAAAfs",
-            authDomain: "classroom-management-82382.firebaseapp.com",
-            projectId: "classroom-management-82382",
-            storageBucket: "classroom-management-82382.firebasestorage.app",
-            messagingSenderId: "146641865620",
-            appId: "1:146641865620:web:ce693b7b064afd5d1bdd81"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const PTEC_APP_ID = "ptec-app";
+        import { auth, db, PTEC_APP_ID, onAuthStateChanged, doc, getDoc, signInAnonymously } from './firebase-config.js';
 
         // State Variables
-        let savedTid = localStorage.getItem('savedTid');
-        let savedSid = localStorage.getItem('savedSid');
+        const urlParams = new URLSearchParams(window.location.search);
+        let savedTid = urlParams.get('tid') || localStorage.getItem('savedTid');
+        let savedSid = urlParams.get('sid') || localStorage.getItem('savedSid');
         let allRecords = []; // Stores formatted array of records {date, status, note}
+        
         const khMonths = ["មករា", "កុម្ភៈ", "មីនា", "មេសា", "ឧសភា", "មិថុនា", "កក្កដា", "សីហា", "កញ្ញា", "តុលា", "វិច្ឆិកា", "ធ្នូ"];
         const khDigits = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
         
@@ -175,21 +160,6 @@
         }
 
         lucide.createIcons();
-
-        // Check if user is legally here
-        if (!savedTid || !savedSid) {
-            alert("សូមធ្វើការឡុកចូលជាមុនសិន!");
-            window.location.href = 'index.html';
-        }
-
-        // Init Auth & Fetch Data
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                await fetchData();
-            } else {
-                signInAnonymously(auth).catch(err => console.error(err));
-            }
-        });
 
         // Setup Dates
         const todayObj = new Date();
@@ -208,6 +178,33 @@
             renderList();
         });
 
+        // Check if user is legally here
+        if (!savedTid || !savedSid) {
+            alert("សូមធ្វើការឡុកចូលជាមុនសិន!");
+            window.location.href = 'index.html';
+        } else {
+            // Init Auth & Fetch Data
+            const initAuth = async () => {
+                try {
+                    if (!auth.currentUser) await signInAnonymously(auth);
+                } catch (error) {
+                    console.error("Auth error:", error);
+                    alert("មិនអាចភ្ជាប់ទៅកាន់ប្រព័ន្ធបានទេ។");
+                }
+            };
+
+            initAuth().then(() => {
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        await fetchData();
+                    } else {
+                        alert("សូមចូលគណនីម្តងទៀត។");
+                        window.location.href = 'index.html';
+                    }
+                });
+            });
+        }
+
         async function fetchData() {
             try {
                 // 1. Fetch Student Info (to show name & photo)
@@ -220,6 +217,24 @@
                     document.getElementById('student-id').textContent = savedSid;
                     if (sData.photo) {
                         document.getElementById('student-photo').src = sData.photo;
+                    }
+                } else {
+                    // Try fetch from Teacher Doc as Fallback
+                    const teacherRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', savedTid);
+                    const tSnap = await getDoc(teacherRef);
+                    if (tSnap.exists()) {
+                        const tData = tSnap.data();
+                        if (tData.students) {
+                            let sData;
+                            if (Array.isArray(tData.students)) sData = tData.students.find(s => s.id === savedSid);
+                            else sData = tData.students[savedSid];
+                            
+                            if (sData) {
+                                document.getElementById('student-name').textContent = sData.name || 'គ្មានឈ្មោះ';
+                                document.getElementById('student-id').textContent = savedSid;
+                                if (sData.photo) document.getElementById('student-photo').src = sData.photo;
+                            }
+                        }
                     }
                 }
 
@@ -271,9 +286,9 @@
         }
 
         function getStatusConfig(status) {
-            if (status === 'P') return { icon: 'check', colorClass: 'text-emerald-500', borderColor: 'border-emerald-500/30 bg-emerald-500/10', label: 'មានវត្តមាន' };
-            if (status === 'L') return { icon: 'file-text', colorClass: 'text-yellow-500', borderColor: 'border-yellow-500/30 bg-yellow-500/10', label: 'សុំច្បាប់' };
-            if (status === 'A') return { icon: 'x', colorClass: 'text-red-500', borderColor: 'border-red-500/30 bg-red-500/10', label: 'អវត្តមាន' };
+            if (status === 'P' || status === 'p') return { icon: 'check', colorClass: 'text-emerald-500', borderColor: 'border-emerald-500/30 bg-emerald-500/10', label: 'មានវត្តមាន' };
+            if (status === 'L' || status === 'l') return { icon: 'file-text', colorClass: 'text-yellow-500', borderColor: 'border-yellow-500/30 bg-yellow-500/10', label: 'សុំច្បាប់' };
+            if (status === 'A' || status === 'a') return { icon: 'x', colorClass: 'text-red-500', borderColor: 'border-red-500/30 bg-red-500/10', label: 'អវត្តមាន' };
             return { icon: 'help-circle', colorClass: 'text-gray-500', borderColor: 'border-gray-500/30 bg-gray-500/10', label: 'មិនស្គាល់' };
         }
 
@@ -337,9 +352,10 @@
 
                 filteredRecords.forEach(record => {
                     // Update Counters
-                    if (record.status === 'P') countP++;
-                    else if (record.status === 'L') countL++;
-                    else if (record.status === 'A') countA++;
+                    const stat = record.status.toUpperCase();
+                    if (stat === 'P') countP++;
+                    else if (stat === 'L') countL++;
+                    else if (stat === 'A') countA++;
 
                     // Formatting Date (e.g., 24 មីនា)
                     const d = new Date(record.date);

@@ -4,11 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>ប្រព័ន្ធអាណាព្យាបាល - Parent Portal</title>
+    
+    <!-- PWA Requirements -->
     <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0d9488">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
+    <!-- Tailwind CSS (នៅរក្សាដដែលសិន ប៉ុន្តែថ្ងៃក្រោយបើមានពេលគួរតែ Build ជា CSS file) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;500;600;700&family=Moul&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    
+    <!-- បន្ថែម defer ដើម្បីកុំឱ្យទប់ស្កាត់ការបង្ហាញ UI (Render Blocking) -->
+    <script src="https://unpkg.com/lucide@latest" defer></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript" defer></script>
     
     <style>
         :root {
@@ -1218,25 +1226,25 @@
         window.applyTranslations();
     </script>
 
-    <!-- Firebase Configuration & Setup -->
+    <!-- Firebase Configuration & Setup (ប្រើប្រាស់ឯកសាររួម) -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // Import មុខងារចាំបាច់ទាំងអស់ចេញពីឯកសារ firebase-config.js តែមួយ
+        import { 
+            auth, 
+            db, 
+            PTEC_APP_ID, 
+            signInAnonymously, 
+            onAuthStateChanged, 
+            doc, 
+            getDoc, 
+            collection, 
+            onSnapshot 
+        } from './firebase-config.js';
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBU50HJrekgHWwwyLq5CTRwhjHkGJAAAfs",
-            authDomain: "classroom-management-82382.firebaseapp.com",
-            projectId: "classroom-management-82382",
-            storageBucket: "classroom-management-82382.firebasestorage.app",
-            messagingSenderId: "146641865620",
-            appId: "1:146641865620:web:ce693b7b064afd5d1bdd81"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const PTEC_APP_ID = "ptec-app";
+        // ==========================================
+        // កូដផ្នែកខាងក្រោមនេះគឺជារបស់ index.html ដដែល 
+        // គ្រាន់តែអ្នកលែងចាំបាច់សរសេរ firebaseConfig និង initializeApp ទៀតហើយ
+        // ==========================================
 
         window.attemptLogin = async function(tid, sid) {
             const errorBox = document.getElementById('login-error');
@@ -1301,14 +1309,24 @@
                     localStorage.setItem('savedTid', tid);
                     localStorage.setItem('savedSid', sid);
 
-                    // ទាញយកព័ត៌មានប្រវត្តិរូបសាលាពីឯកសាររបស់គ្រូ
+                    // ទាញយកព័ត៌មានប្រវត្តិរូបសាលាពីឯកសាររបស់គ្រូ (ពី Subcollection profile/data)
                     try {
-                        const teacherRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid);
-                        const teacherSnap = await getDoc(teacherRef);
-                        if (teacherSnap.exists()) {
-                            const pData = teacherSnap.data().profile || teacherSnap.data();
+                        const profileRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid, 'profile', 'data');
+                        const profileSnap = await getDoc(profileRef);
+                        
+                        if (profileSnap.exists()) {
+                            const pData = profileSnap.data();
                             if (pData.school_name_admin) document.getElementById('header-school-name').textContent = pData.school_name_admin;
                             if (pData.academic_year) document.getElementById('header-academic-year').textContent = (localStorage.getItem('app_lang') === 'en' ? "Academic Year " : "ឆ្នាំសិក្សា ") + pData.academic_year;
+                        } else {
+                            // Fallback ករណីគ្មាន Subcollection (សាកទាញពី Document គ្រូផ្ទាល់)
+                            const teacherRef = doc(db, 'artifacts', PTEC_APP_ID, 'users', tid);
+                            const teacherSnap = await getDoc(teacherRef);
+                            if (teacherSnap.exists()) {
+                                const tData = teacherSnap.data();
+                                if (tData.school_name_admin) document.getElementById('header-school-name').textContent = tData.school_name_admin;
+                                if (tData.academic_year) document.getElementById('header-academic-year').textContent = (localStorage.getItem('app_lang') === 'en' ? "Academic Year " : "ឆ្នាំសិក្សា ") + tData.academic_year;
+                            }
                         }
                     } catch (e) { console.warn("Could not fetch school profile"); }
 
@@ -1409,5 +1427,9 @@
 
         initAuth();
     </script>
+    
+    <!-- PWA Install Script -->
+    <script src="pwa-install.js"></script>
+
 </body>
 </html>
